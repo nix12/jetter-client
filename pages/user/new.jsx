@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import Link from 'next/link'
 import Router from 'next/router';
 import { connect } from 'react-redux';
 
 import Input from '../../components/UI/Input/Input';
 import Button from '../../components/UI/Button/Button';
+import Layout from '../../containers/Layout/Layout';
 import * as actions from '../../store/actions/index';
 import { updateObject, checkValidity } from '../../shared/utility';
 
@@ -117,12 +117,8 @@ class New extends Component {
     }
 
     return (
-      <div>
+      <Layout>
         <h1>Sign Up</h1>
-
-        <Link href='/index'>
-          <a>Home</a>
-        </Link>
 
         <div>
           { errorMessage }
@@ -131,7 +127,7 @@ class New extends Component {
             <Button>Submit</Button>
           </form>
         </div>
-      </div>
+      </Layout>
     )
   }
 }

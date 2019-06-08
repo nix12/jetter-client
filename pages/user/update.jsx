@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Router from 'next/router'
-import axios from '../../services/axios/axios-user';
 
 import Input from '../../components/UI/Input/Input';
 import Button from '../../components/UI/Button/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Layout from '../../containers/Layout/Layout';
+import Can from '../../components/Permission/Can';
 import { checkValidity, updateObject } from '../../shared/utility';
 import * as actions from '../../store/actions/index';
 
@@ -115,15 +116,18 @@ class Update extends Component {
     }
 
     return (
-      <div>
+      <Layout>
         <h1>Update Password</h1>
 
         { errorMessage }
-        <form onSubmit={ this.submitHandler }>
-          { form }
-          <Button>Submit</Button>
-        </form>
-      </div>
+
+        <Can I='manage' this='User'>
+          <form onSubmit={ this.submitHandler }>
+            { form }
+            <Button>Submit</Button>
+          </form>
+        </Can>
+      </Layout>
     )
   }
 }

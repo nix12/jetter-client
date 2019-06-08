@@ -15,7 +15,7 @@
       "static/runtime/webpack.js",
       "static/runtime/main.js"
     ],
-    "/user/update": [
+    "/auth/logout": [
       "static/runtime/webpack.js",
       "static/runtime/main.js"
     ]

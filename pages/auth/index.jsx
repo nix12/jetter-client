@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import Link from 'next/link'
 import { connect } from 'react-redux';
 import ability from '../../services/casl/ability';
 
 import Input from '../../components/UI/Input/Input';
 import Button from '../../components/UI/Button/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Layout from '../../containers/Layout/Layout';
 import { updateObject, checkValidity } from '../../shared/utility';
 import * as actions from '../../store/actions/index';
 
@@ -104,20 +104,8 @@ class Auth extends Component {
     );
 
     return (
-      <div>
-        <h1>Auth</h1>
-
-        <Link href='/index'>
-          <a>Home</a>
-        </Link>
-
-        <Link href={ `/user/show?slug=${ this.props.username }` } as={ `/user/${ this.props.username }` }>
-          <a>My Profile</a>
-        </Link>
-
-        <Link href='/auth/logout' as='/logout'>
-          <a>Logout</a>
-        </Link>
+      <Layout>
+        <h1>Auth</h1>   
 
         <div>
           { errorMessage }
@@ -132,13 +120,12 @@ class Auth extends Component {
           <label style={{ display: 'block' }}>Username: { this.props.username }</label>
           { abilities }
         </div>
-      </div>
+      </Layout>
     )
   }
 }
 
 const mapStateToProps = state => {
-  console.log('auth state', state)
   return {
     userId: state.auth.currentUser.userId,
     username: state.auth.currentUser.username

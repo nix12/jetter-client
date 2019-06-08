@@ -1,26 +1,15 @@
-import React, {Component} from "react";
-import Link from 'next/link'
-import { connect } from "react-redux";
+import React, { Component } from 'react';
 
-class Page extends Component {
-    
+import Layout from '../containers/Layout/Layout';
+
+class Page extends Component { 
   render() {
     return (
-      <div>
-        <Link href='/auth'>
-          <a>Auth</a>
-        </Link>
-
-        <Link href='user/new'>
-          <a>Sign Up</a>
-        </Link>
-
-        <Link href='user/update'>
-          <a>Update Password</a>
-        </Link>
-      </div>
-    )
+      <Layout>
+        <p>Welcome to Jetter</p>
+      </Layout>
+    );
   }
 }
 
-export default connect(null, null)(Page);
+export default Page;
