@@ -1,15 +1,5 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-import Layout from '../containers/Layout/Layout';
+const page = () => <p>Welcome to Jetter</p>
 
-class Page extends Component { 
-  render() {
-    return (
-      <Layout>
-        <p>Welcome to Jetter</p>
-      </Layout>
-    );
-  }
-}
-
-export default Page;
+export default page;

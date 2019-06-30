@@ -1,12 +1,14 @@
-require('dotenv').config()
-const webpack = require('webpack')
+const { parsed: localEnv } = require('dotenv').config();
+const webpack = require('webpack');
 
-module.exports = {
-  webpack: (config) => {
-    config.plugins.push(
-      new webpack.EnvironmentPlugin(process.env)
-    )
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true'
+});
 
-    return config
+module.exports = withBundleAnalyzer({
+  webpack(config) {
+    config.plugins.push(new webpack.EnvironmentPlugin(localEnv));
+    
+    return config;
   }
-}
+});

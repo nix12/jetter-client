@@ -1,14 +1,12 @@
-import Router from 'next/router'
+import Router from 'next/router';
 
 export default function redirectTo(destination, asPath, { res, status } = {}) {
   if (res) {
     res.writeHead(status || 302, { Location: destination });
     res.end();
+  } else if (destination[0] === '/' && destination[1] !== '/') {
+    Router.push(destination, asPath);
   } else {
-    if (destination[0] === '/' && destination[1] !== '/') {
-      Router.push(destination, asPath);
-    } else {
-      window.location = destination;
-    }
+    window.location = destination;
   }
 }

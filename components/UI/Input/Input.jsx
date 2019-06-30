@@ -1,45 +1,32 @@
 import React from 'react';
 
-const input = (props) => {
+const input = props => {
+  const { elementConfig, elementType, value, name, changed } = props;
   let inputElement = null;
-  // const inputClasses = [];
 
-  // if (props.invalid && props.shouldValidate && props.touched) {
-  //   inputClasses.push(classes.Invalid)
-  // }
-
-  switch (props.elementType) {
-    case ('input'):
-      inputElement = <input
-        // className={ inputClasses.join(' ') }
-        { ...props.elementConfig }
-        value={ props.value }
-        onChange={ props.changed }
-      />;
+  switch (elementType) {
+    case 'input':
+      inputElement = (
+        <input
+          {...elementConfig}
+          value={value}
+          onChange={changed}
+          name={name}
+        />
+      );
       break;
-    case ('textarea'):
-      inputElement = <textarea
-        // className={ inputClasses.join(' ') }
-        { ...props.elementConfig }
-        value={ props.value }
-        onChange={ props.changed }
-      />;
+    case 'textarea':
+      inputElement = (
+        <textarea {...elementConfig} value={value} onChange={changed} />
+      );
       break;
-      default:
-      inputElement = <input
-        // className={ inputClasses.join(' ') }
-        { ...props.elementConfig }
-        value={ props.value }
-        onChange={ props.changed }
-      />;
+    default:
+      inputElement = (
+        <input {...elementConfig} value={value} onChange={changed} />
+      );
   }
 
-  return (
-    <div>
-      <label>{ props.label }</label>
-      { inputElement }
-    </div>
-  );
+  return <div>{inputElement}</div>;
 };
 
 export default input;

@@ -16,36 +16,36 @@ import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import NavigationItems from '../NavigationItems/NavigationItems';
 import Button from '@material-ui/core/Button';
+import NavigationItems from '../NavigationItems/NavigationItems';
 
 const useStyles = makeStyles(theme => ({
   grow: {
-    flexGrow: 1,
+    flexGrow: 1
   },
   menuButton: {
-    marginRight: theme.spacing(2),
+    marginRight: theme.spacing(2)
   },
   title: {
     display: 'none',
     [theme.breakpoints.up('sm')]: {
-      display: 'block',
-    },
+      display: 'block'
+    }
   },
   search: {
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
     backgroundColor: fade(theme.palette.common.white, 0.15),
     '&:hover': {
-      backgroundColor: fade(theme.palette.common.white, 0.25),
+      backgroundColor: fade(theme.palette.common.white, 0.25)
     },
     marginRight: theme.spacing(2),
     marginLeft: 0,
     width: '100%',
     [theme.breakpoints.up('sm')]: {
       marginLeft: theme.spacing(3),
-      width: 'auto',
-    },
+      width: 'auto'
+    }
   },
   searchIcon: {
     width: theme.spacing(7),
@@ -54,34 +54,34 @@ const useStyles = makeStyles(theme => ({
     pointerEvents: 'none',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   inputRoot: {
-    color: 'inherit',
+    color: 'inherit'
   },
   inputInput: {
     padding: theme.spacing(1, 1, 1, 7),
     transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('md')]: {
-      width: 200,
-    },
+      width: 200
+    }
   },
   sectionDesktop: {
     display: 'none',
     [theme.breakpoints.up('md')]: {
-      display: 'flex',
-    },
+      display: 'flex'
+    }
   },
   sectionMobile: {
     display: 'flex',
     [theme.breakpoints.up('md')]: {
-      display: 'none',
-    },
-  },
+      display: 'none'
+    }
+  }
 }));
 
-const toolbar = (props) => {
+const toolbar = props => {
   const { loggedIn, user } = props;
   const classes = useStyles();
 
@@ -104,18 +104,15 @@ const toolbar = (props) => {
     handleMobileMenuClose();
   }
 
-  function handleMobileMenuOpen(event) {
-    setMobileMoreAnchorEl(event.currentTarget);
-  }
-
   const renderMenu = (
-    <NavigationItems 
-      name={ user }
+    <NavigationItems
+      id="navItems"
+      name={user}
       anchorEl={anchorEl}
       anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       open={isMenuOpen}
-      onClose={handleMenuClose} 
+      onClose={handleMenuClose}
     />
   );
 
@@ -151,7 +148,7 @@ const toolbar = (props) => {
       </MenuItem>
     </Menu>
   );
-  
+
   const loggedInNav = (
     <div>
       <IconButton color="inherit">
@@ -159,7 +156,7 @@ const toolbar = (props) => {
           <MailIcon />
         </Badge>
       </IconButton>
-      
+
       <IconButton
         edge="end"
         aria-owns={isMenuOpen ? 'material-appbar' : undefined}
@@ -173,69 +170,66 @@ const toolbar = (props) => {
   );
 
   const loggedOutNav = (
-    <div>  
-      <Link href='/user/new' as='/signup'>
-        <Button color='inherit'>
-          Sign Up
-        </Button>
+    <div>
+      <Link href="/user/new" as="/signup">
+        <Button color="inherit">Sign Up</Button>
       </Link>
-      
-      <Link href='/auth' as='/login'>
-        <Button color='inherit'>
-          Login
-        </Button>
-      </Link>    
+
+      <Link href="/auth" as="/login">
+        <Button color="inherit">Login</Button>
+      </Link>
     </div>
   );
 
   const loggedInMobileNav = (
-    <IconButton aria-haspopup="true" onClick={handleProfileMenuOpen} color="inherit">
+    <IconButton
+      aria-haspopup="true"
+      onClick={handleProfileMenuOpen}
+      color="inherit"
+    >
       <MenuIcon />
     </IconButton>
   );
 
   return (
     <header>
-      <nav>
-        <div className={classes.grow}>
-          <AppBar position="static">
-            <Toolbar>
-              
-              <Link href='/index' as='/'>
-                <Button color='inherit'>
-                  <Typography className={classes.title} variant="h6" noWrap>
-                    Jetter
-                  </Typography>
-                </Button>
-              </Link>
-              
-              <div className={classes.search}>
-                <div className={classes.searchIcon}>
-                  <SearchIcon />
-                </div>
-                <InputBase
-                  placeholder="Search…"
-                  classes={{
-                    root: classes.inputRoot,
-                    input: classes.inputInput,
-                  }}
-                />
+      <nav className={classes.grow}>
+        <AppBar position="static">
+          <Toolbar>
+            <Link href="/index" as="/">
+              <Button color="inherit">
+                <Typography className={classes.title} variant="h6" noWrap>
+                  Jetter
+                </Typography>
+              </Button>
+            </Link>
+
+            <div className={classes.search}>
+              <div className={classes.searchIcon}>
+                <SearchIcon />
               </div>
-              <div className={classes.grow} />
-              <div className={classes.sectionDesktop}>
-                { loggedIn ? loggedInNav : loggedOutNav }
-              </div>
-              <div className={classes.sectionMobile}>
-                { loggedIn ? loggedInMobileNav : loggedOutNav }
-              </div>
-            </Toolbar>
-          </AppBar>
-          { renderMenu }
-          {renderMobileMenu}
-        </div>
+              <InputBase
+                placeholder="Search…"
+                classes={{
+                  root: classes.inputRoot,
+                  input: classes.inputInput
+                }}
+              />
+            </div>
+            <div className={classes.grow} />
+            <div className={classes.sectionDesktop}>
+              {loggedIn ? loggedInNav : loggedOutNav}
+            </div>
+            <div className={classes.sectionMobile}>
+              {loggedIn ? loggedInMobileNav : loggedOutNav}
+            </div>
+          </Toolbar>
+        </AppBar>
+        {renderMenu}
+        {renderMobileMenu}
       </nav>
     </header>
-  )
-}
+  );
+};
 
 export default toolbar;

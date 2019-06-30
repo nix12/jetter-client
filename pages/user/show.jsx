@@ -1,39 +1,17 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import User from '../../components/User/User';
-import Layout from '../../containers/Layout/Layout';
+import Template from '../../templates/user/show.template';
 
-class Show extends Component { 
-  static async getInitialProps ({ req, isServer }) {
-    if (isServer) {
-      return {
-        userId: req.userId,
-        username: req.username,
-      }
-    }
-  }
-  
-
+class Show extends Component {
   render() {
-    return (
-      <Layout>
-        <h1>My Profile</h1>
-
-        <User 
-          id={ this.props.userId }
-          username={ this.props.username } 
-        />
-      </Layout>    
-    )
+    return <Template {...this.props} />;
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    userId: state.auth.currentUser.userId,
-    username: state.auth.currentUser.username
-  }
-}
+const mapStateToProps = state => ({
+  userId: state.auth.currentUser.userId,
+  username: state.auth.currentUser.username
+});
 
 export default connect(mapStateToProps)(Show);

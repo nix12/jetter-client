@@ -1,6 +1,7 @@
 const express = require('express');
 const next = require('next');
 const cookiesMiddleware = require('universal-cookie-express');
+const helmet = require('helmet');
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
@@ -10,14 +11,14 @@ app
   .prepare()
   .then(async () => {
     const server = express();
-    
-    server.use(cookiesMiddleware())
 
+    server.use(helmet());
+    server.use(cookiesMiddleware());
     server.use((req, res, next) => {
       req.userId = req.universalCookies.get('userId');
       req.username = req.universalCookies.get('username');
-      next()
-    })   
+      next();
+    });
 
     server.get('/u/:username/password', async (req, res) => {
       app.render(req, res, '/user/update', {
@@ -41,8 +42,8 @@ app
     });
 
     server.get('/logout', async (req, res) => {
-      app.render(req, res);
-    })
+      app.render(req, res, '/logout', {});
+    });
 
     server.get('/', async (req, res) => {
       app.render(req, res, '/index', {});
@@ -52,12 +53,12 @@ app
       return handle(req, res);
     });
 
-    server.listen(3000, (err) => {
-      if (err) throw err
+    server.listen(3000, err => {
+      if (err) throw err;
       console.log('> Ready on http://localhost:3000');
     });
   })
-  .catch((ex) => {
+  .catch(ex => {
     console.log(ex.stack);
     process.exit(1);
-  })
+  });

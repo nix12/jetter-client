@@ -1,33 +1,23 @@
 import React, { Component } from 'react';
+import { withRouter } from 'next/router';
 import { connect } from 'react-redux';
-import Router from 'next/router';
-
-import CircularProgress from '@material-ui/core/CircularProgress';
 import * as actions from '../../store/actions/index';
 
+import Template from '../../templates/auth/logout.template';
+
 class Logout extends Component {
-  componentDidMount = () => {
-    this.logoutAndRedirect();
-  };
-
-  logoutAndRedirect = () => {
-    const { onLogout } = this.props;
-
-    onLogout()
-      .then(() => {
-        Router.push('/');
-      })
-  }
-
-  render () {
-    return <CircularProgress />;
-  } 
-}
-
-const mapDispatchToProps = dispatch => {
-  return {
-    onLogout: () => dispatch(actions.logout())
+  render() {
+    return <Template {...this.props} />;
   }
 }
 
-export default connect(null, mapDispatchToProps)(Logout);
+const mapDispatchToProps = dispatch => ({
+  onLogout: () => dispatch(actions.logout())
+});
+
+export default withRouter(
+  connect(
+    null,
+    mapDispatchToProps
+  )(Logout)
+);

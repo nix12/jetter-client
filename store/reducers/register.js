@@ -3,38 +3,41 @@ import { updateObject } from '../../shared/utility';
 
 const initialState = {
   error: null,
-  loading: false,
-}
+  loading: false
+};
 
-const registerStart = (state, action) => {
+export const registerStart = (state, action) => {
   return updateObject(state, {
     error: null,
-    loading: true,
+    loading: true
   });
-}
+};
 
-const registerSuccess = (state, action) => {
+export const registerSuccess = (state, action) => {
   return updateObject(state, {
     error: null,
-    loading: false,
+    loading: false
   });
-}
+};
 
-const registerFail = (state, action) => {
-  console.log('action error', action.error)
+export const registerFail = (state, action) => {
   return updateObject(state, {
     error: action.error,
-    loading: false,
+    loading: false
   });
-}
+};
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case (actionTypes.REGISTER_START) : return registerStart(state, action);
-    case (actionTypes.REGISTER_SUCCESS) : return registerSuccess(state, action);
-    case (actionTypes.REGISTER_FAIL) : return registerFail(state, action);
-    default: return state;
+    case actionTypes.REGISTER_START:
+      return registerStart(state, action);
+    case actionTypes.REGISTER_SUCCESS:
+      return registerSuccess(state, action);
+    case actionTypes.REGISTER_FAIL:
+      return registerFail(state, action);
+    default:
+      return state;
   }
-}
+};
 
 export default reducer;
