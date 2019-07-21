@@ -23,18 +23,21 @@ import Layout from '../containers/Layout/Layout';
 const rootReducer = combineReducers({
   auth: authReducer,
   register: registerReducer,
-  user: userReducer,
+  user: userReducer
 });
 
-const makeStore = (initialState, options) => createStore(rootReducer, initialState, applyMiddleware(thunk));
+const makeStore = (initialState, options) =>
+  createStore(rootReducer, initialState, applyMiddleware(thunk));
 
 class MyApp extends App {
   static async getInitialProps({ Component, ctx }) {
     const cookies = new Cookies();
-    const pageProps = Component.getInitialProps ? await Component.getInitialProps(ctx) : {};
+    const pageProps = Component.getInitialProps
+      ? await Component.getInitialProps(ctx)
+      : {};
 
     if (typeof cookies.get('token') === 'undefined') {
-      if (ctx.pathname == '/auth' || ctx.pathname === '/user/new') {
+      if (ctx.pathname === '/auth' || ctx.pathname === '/user/new') {
         return { pageProps };
       }
       redirectTo('/auth', '/login', { res: ctx.res, status: 301 });

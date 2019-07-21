@@ -1,5 +1,6 @@
-import axios from '../../services/axios/axios-user';
 import Cookies from 'universal-cookie';
+import jwtDecode from 'jwt-decode';
+import axios from '../../services/axios/axios-user';
 import * as actionTypes from './actionTypes';
 import ability from '../../services/casl/ability';
 
@@ -34,22 +35,16 @@ export const removeCookie = () => {
   const cookies = new Cookies();
 
   cookies.remove('token', { path: '/' });
-  cookies.remove('userId', { path: '/' });
-  cookies.remove('username', { path: '/' });
   cookies.remove('expirationDate', { path: '/' });
-  cookies.remove('rules', { path: '/' });
 };
 
-export const setCookie = (token, userId, username, expirationDate, rules) => {
+export const setCookie = (token, expirationDate) => {
   const cookies = new Cookies();
 
   cookies.set('token', token, { path: '/' });
-  cookies.set('userId', userId, { path: '/' });
-  cookies.set('username', username, { path: '/' });
   cookies.set('expirationDate', new Date().getTime() + expirationDate * 1000, {
     path: '/'
   });
-  cookies.set('rules', rules, { path: '/' });
 };
 
 export const logout = () => dispatch => {
@@ -59,7 +54,7 @@ export const logout = () => dispatch => {
 
   const tokenData = {
     token
-  }
+  };
   if (token) {
     axios.post(url, tokenData).catch(err => console.log(err));
   }
@@ -85,19 +80,14 @@ export const auth = (username, password) => dispatch => {
   axios
     .post(url, authData)
     .then(response => {
-      setCookie(
-        response.data.access_token,
-        response.data.user.userId,
-        response.data.user.username,
-        response.data.expires_in,
-        response.data.user.rules
-      );
+      const token = response.data.access_token;
+      const data = jwtDecode(token);
 
-      ability.update(response.data.user.rules);
+      setCookie(token, response.data.expires_in);
 
-      dispatch(
-        authSuccess(response.data.user.userId, response.data.user.username)
-      );
+      ability.update(data.rules);
+
+      dispatch(authSuccess(data.userId, data.username));
     })
     .catch(err => {
       dispatch(authFail(err.response.data.errors));
@@ -111,16 +101,15 @@ export const authCheckState = () => dispatch => {
   if (!token) {
     dispatch(logout());
   } else {
+    const data = jwtDecode(token);
     const expirationDate = cookies.get('expirationDate');
 
     if (expirationDate <= new Date().getTime()) {
       dispatch(logout());
     } else {
-      const userId = cookies.get('userId');
-      const username = cookies.get('username');
-      ability.update(cookies.get('rules'));
+      ability.update(data.rules);
 
-      dispatch(authSuccess(userId, username));
+      dispatch(authSuccess(data.userId, data.username));
     }
   }
 };

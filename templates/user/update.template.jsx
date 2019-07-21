@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Cookies from 'universal-cookie';
+import jwtDecode from 'jwt-decode';
 
 import Input from '../../components/UI/Input/Input';
 import Button from '../../components/UI/Button/Button';
@@ -72,10 +73,12 @@ class Template extends Component {
     event.preventDefault();
 
     const cookies = new Cookies();
+    const token = cookies.get('token');
+    const data = jwtDecode(token);
 
     return Promise.resolve(
       this.props.onUpdate(
-        cookies.get('username'),
+        data.username,
         this.state.controls.current_password.value,
         this.state.controls.password.value,
         this.state.controls.password_confirmation.value

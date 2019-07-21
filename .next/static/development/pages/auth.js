@@ -25920,6 +25920,137 @@ var index = create();
 
 /***/ }),
 
+/***/ "./node_modules/jwt-decode/lib/atob.js":
+/*!*********************************************!*\
+  !*** ./node_modules/jwt-decode/lib/atob.js ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * The code was extracted from:
+ * https://github.com/davidchambers/Base64.js
+ */
+
+var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+
+function InvalidCharacterError(message) {
+  this.message = message;
+}
+
+InvalidCharacterError.prototype = new Error();
+InvalidCharacterError.prototype.name = 'InvalidCharacterError';
+
+function polyfill (input) {
+  var str = String(input).replace(/=+$/, '');
+  if (str.length % 4 == 1) {
+    throw new InvalidCharacterError("'atob' failed: The string to be decoded is not correctly encoded.");
+  }
+  for (
+    // initialize result and counters
+    var bc = 0, bs, buffer, idx = 0, output = '';
+    // get next character
+    buffer = str.charAt(idx++);
+    // character found in table? initialize bit storage and add its ascii value;
+    ~buffer && (bs = bc % 4 ? bs * 64 + buffer : buffer,
+      // and if not first of each 4 characters,
+      // convert the first 8 bits to one ascii character
+      bc++ % 4) ? output += String.fromCharCode(255 & bs >> (-2 * bc & 6)) : 0
+  ) {
+    // try to find character in table (0-63, not found => -1)
+    buffer = chars.indexOf(buffer);
+  }
+  return output;
+}
+
+
+module.exports = typeof window !== 'undefined' && window.atob && window.atob.bind(window) || polyfill;
+
+
+/***/ }),
+
+/***/ "./node_modules/jwt-decode/lib/base64_url_decode.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/jwt-decode/lib/base64_url_decode.js ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var atob = __webpack_require__(/*! ./atob */ "./node_modules/jwt-decode/lib/atob.js");
+
+function b64DecodeUnicode(str) {
+  return decodeURIComponent(atob(str).replace(/(.)/g, function (m, p) {
+    var code = p.charCodeAt(0).toString(16).toUpperCase();
+    if (code.length < 2) {
+      code = '0' + code;
+    }
+    return '%' + code;
+  }));
+}
+
+module.exports = function(str) {
+  var output = str.replace(/-/g, "+").replace(/_/g, "/");
+  switch (output.length % 4) {
+    case 0:
+      break;
+    case 2:
+      output += "==";
+      break;
+    case 3:
+      output += "=";
+      break;
+    default:
+      throw "Illegal base64url string!";
+  }
+
+  try{
+    return b64DecodeUnicode(output);
+  } catch (err) {
+    return atob(output);
+  }
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/jwt-decode/lib/index.js":
+/*!**********************************************!*\
+  !*** ./node_modules/jwt-decode/lib/index.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var base64_url_decode = __webpack_require__(/*! ./base64_url_decode */ "./node_modules/jwt-decode/lib/base64_url_decode.js");
+
+function InvalidTokenError(message) {
+  this.message = message;
+}
+
+InvalidTokenError.prototype = new Error();
+InvalidTokenError.prototype.name = 'InvalidTokenError';
+
+module.exports = function (token,options) {
+  if (typeof token !== 'string') {
+    throw new InvalidTokenError('Invalid token specified');
+  }
+
+  options = options || {};
+  var pos = options.header === true ? 0 : 1;
+  try {
+    return JSON.parse(base64_url_decode(token.split('.')[pos]));
+  } catch (e) {
+    throw new InvalidTokenError('Invalid token specified: ' + e.message);
+  }
+};
+
+module.exports.InvalidTokenError = InvalidTokenError;
+
+
+/***/ }),
+
 /***/ "./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2Fauth&absolutePagePath=%2Fhome%2Fdeveloper%2FProjects%2Fclient%2Fpages%2Fauth%2Findex.jsx!./":
 /*!***********************************************************************************************************************************************************************************!*\
   !*** ./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2Fauth&absolutePagePath=%2Fhome%2Fdeveloper%2FProjects%2Fclient%2Fpages%2Fauth%2Findex.jsx ***!
@@ -30628,90 +30759,75 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "logout", function() { return logout; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "auth", function() { return auth; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "authCheckState", function() { return authCheckState; });
-/* harmony import */ var _services_axios_axios_user__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../services/axios/axios-user */ "./services/axios/axios-user.js");
-/* harmony import */ var universal_cookie__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! universal-cookie */ "./node_modules/universal-cookie/es6/index.js");
-/* harmony import */ var _actionTypes__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./actionTypes */ "./store/actions/actionTypes.js");
-/* harmony import */ var _services_casl_ability__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../services/casl/ability */ "./services/casl/ability.js");
+/* harmony import */ var universal_cookie__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! universal-cookie */ "./node_modules/universal-cookie/es6/index.js");
+/* harmony import */ var jwt_decode__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! jwt-decode */ "./node_modules/jwt-decode/lib/index.js");
+/* harmony import */ var jwt_decode__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jwt_decode__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _services_axios_axios_user__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../services/axios/axios-user */ "./services/axios/axios-user.js");
+/* harmony import */ var _actionTypes__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./actionTypes */ "./store/actions/actionTypes.js");
+/* harmony import */ var _services_casl_ability__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../services/casl/ability */ "./services/casl/ability.js");
+
 
 
 
 
 var authStart = function authStart() {
   return {
-    type: _actionTypes__WEBPACK_IMPORTED_MODULE_2__["AUTH_START"]
+    type: _actionTypes__WEBPACK_IMPORTED_MODULE_3__["AUTH_START"]
   };
 };
 var authSuccess = function authSuccess(userId, username) {
   return {
-    type: _actionTypes__WEBPACK_IMPORTED_MODULE_2__["AUTH_SUCCESS"],
+    type: _actionTypes__WEBPACK_IMPORTED_MODULE_3__["AUTH_SUCCESS"],
     userId: userId,
     username: username
   };
 };
 var authFail = function authFail(error) {
   return {
-    type: _actionTypes__WEBPACK_IMPORTED_MODULE_2__["AUTH_FAIL"],
+    type: _actionTypes__WEBPACK_IMPORTED_MODULE_3__["AUTH_FAIL"],
     error: error
   };
 };
 var authLogout = function authLogout() {
   return {
-    type: _actionTypes__WEBPACK_IMPORTED_MODULE_2__["AUTH_LOGOUT"]
+    type: _actionTypes__WEBPACK_IMPORTED_MODULE_3__["AUTH_LOGOUT"]
   };
 };
 var removeCookie = function removeCookie() {
-  var cookies = new universal_cookie__WEBPACK_IMPORTED_MODULE_1__["default"]();
+  var cookies = new universal_cookie__WEBPACK_IMPORTED_MODULE_0__["default"]();
   cookies.remove('token', {
-    path: '/'
-  });
-  cookies.remove('userId', {
-    path: '/'
-  });
-  cookies.remove('username', {
     path: '/'
   });
   cookies.remove('expirationDate', {
     path: '/'
   });
-  cookies.remove('rules', {
-    path: '/'
-  });
 };
-var setCookie = function setCookie(token, userId, username, expirationDate, rules) {
-  var cookies = new universal_cookie__WEBPACK_IMPORTED_MODULE_1__["default"]();
+var setCookie = function setCookie(token, expirationDate) {
+  var cookies = new universal_cookie__WEBPACK_IMPORTED_MODULE_0__["default"]();
   cookies.set('token', token, {
     path: '/'
   });
-  cookies.set('userId', userId, {
-    path: '/'
-  });
-  cookies.set('username', username, {
-    path: '/'
-  });
   cookies.set('expirationDate', new Date().getTime() + expirationDate * 1000, {
-    path: '/'
-  });
-  cookies.set('rules', rules, {
     path: '/'
   });
 };
 var logout = function logout() {
   return function (dispatch) {
     var url = '/oauth/revoke';
-    var cookies = new universal_cookie__WEBPACK_IMPORTED_MODULE_1__["default"]();
+    var cookies = new universal_cookie__WEBPACK_IMPORTED_MODULE_0__["default"]();
     var token = cookies.get('token');
     var tokenData = {
       token: token
     };
 
     if (token) {
-      _services_axios_axios_user__WEBPACK_IMPORTED_MODULE_0__["default"].post(url, tokenData).catch(function (err) {
+      _services_axios_axios_user__WEBPACK_IMPORTED_MODULE_2__["default"].post(url, tokenData).catch(function (err) {
         return console.log(err);
       });
     }
 
     removeCookie();
-    _services_casl_ability__WEBPACK_IMPORTED_MODULE_3__["default"].update([]);
+    _services_casl_ability__WEBPACK_IMPORTED_MODULE_4__["default"].update([]);
     dispatch(authLogout());
   };
 };
@@ -30726,10 +30842,12 @@ var auth = function auth(username, password) {
       client_secret: "LySP9Cpxh77_4L03Yt6UodybwiuTQaWZpLHYITm5KF4"
     };
     var url = '/oauth/token';
-    _services_axios_axios_user__WEBPACK_IMPORTED_MODULE_0__["default"].post(url, authData).then(function (response) {
-      setCookie(response.data.access_token, response.data.user.userId, response.data.user.username, response.data.expires_in, response.data.user.rules);
-      _services_casl_ability__WEBPACK_IMPORTED_MODULE_3__["default"].update(response.data.user.rules);
-      dispatch(authSuccess(response.data.user.userId, response.data.user.username));
+    _services_axios_axios_user__WEBPACK_IMPORTED_MODULE_2__["default"].post(url, authData).then(function (response) {
+      var token = response.data.access_token;
+      var data = jwt_decode__WEBPACK_IMPORTED_MODULE_1___default()(token);
+      setCookie(token, response.data.expires_in);
+      _services_casl_ability__WEBPACK_IMPORTED_MODULE_4__["default"].update(data.rules);
+      dispatch(authSuccess(data.userId, data.username));
     }).catch(function (err) {
       dispatch(authFail(err.response.data.errors));
     });
@@ -30737,21 +30855,20 @@ var auth = function auth(username, password) {
 };
 var authCheckState = function authCheckState() {
   return function (dispatch) {
-    var cookies = new universal_cookie__WEBPACK_IMPORTED_MODULE_1__["default"]();
+    var cookies = new universal_cookie__WEBPACK_IMPORTED_MODULE_0__["default"]();
     var token = cookies.get('token');
 
     if (!token) {
       dispatch(logout());
     } else {
+      var data = jwt_decode__WEBPACK_IMPORTED_MODULE_1___default()(token);
       var expirationDate = cookies.get('expirationDate');
 
       if (expirationDate <= new Date().getTime()) {
         dispatch(logout());
       } else {
-        var userId = cookies.get('userId');
-        var username = cookies.get('username');
-        _services_casl_ability__WEBPACK_IMPORTED_MODULE_3__["default"].update(cookies.get('rules'));
-        dispatch(authSuccess(userId, username));
+        _services_casl_ability__WEBPACK_IMPORTED_MODULE_4__["default"].update(data.rules);
+        dispatch(authSuccess(data.userId, data.username));
       }
     }
   };
