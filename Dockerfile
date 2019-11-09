@@ -6,7 +6,7 @@ COPY . /jetter-client
 
 ADD .profile.d /app/.profile.d
 
-RUN chmod +x /app/.profile.d/heroku-exec.sh
+RUN chmod 777 /app/.profile.d/heroku-exec.sh
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
@@ -14,4 +14,6 @@ WORKDIR /jetter-client
 
 RUN npm install
 
-CMD ["npm", "run", "dev"]
+RUN npm run build
+
+CMD ["npm", "start"]
