@@ -1,11 +1,13 @@
-FROM node:8.16
+FROM node:13.1
 
-RUN mkdir /jetter-client
-
-WORKDIR /jetter-client
+RUN apt-get update -qq && apt-get install -y bash curl openssh-server python3
 
 COPY . /jetter-client
 
+WORKDIR /jetter-client
+
 RUN npm install
 
-CMD ["npm", "run", "dev"]
+RUN npm run build
+
+CMD ["npm", "start"]
