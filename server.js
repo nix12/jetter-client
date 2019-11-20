@@ -1,64 +1,41 @@
-const express = require('express');
+const { createServer } = require('http');
+const { parse } = require('url');
 const next = require('next');
-const cookiesMiddleware = require('universal-cookie-express');
-const helmet = require('helmet');
 
+const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-app
-  .prepare()
-  .then(async () => {
-    const server = express();
+app.prepare().then(() => {
+  createServer((req, res) => {
+    const parsedUrl = parse(req.url, true);
+    const { pathname, query } = parsedUrl;
 
-    server.use(helmet());
-    server.use(cookiesMiddleware());
-    server.use((req, res, next) => {
-      req.userId = req.universalCookies.get('userId');
-      req.username = req.universalCookies.get('username');
-      next();
-    });
+    console.log('parsedUser', parsedUrl);
 
-    server.get('/u/:username/password', async (req, res) => {
-      app.render(req, res, '/user/update', {
-        username: req.username
-      });
-    });
-
-    server.get('/u/:username', async (req, res) => {
-      app.render(req, res, '/user/show', {
-        userId: req.userId,
-        username: req.username
-      });
-    });
-
-    server.get('/signup', async (req, res) => {
-      app.render(req, res, '/user/new', {});
-    });
-
-    server.get('/login', async (req, res) => {
-      app.render(req, res, '/auth', {});
-    });
-
-    server.get('/logout', async (req, res) => {
-      app.render(req, res, '/logout', {});
-    });
-
-    server.get('/', async (req, res) => {
-      app.render(req, res, '/index', {});
-    });
-
-    server.get('*', (req, res) => {
-      return handle(req, res);
-    });
-
-    server.listen(3000, err => {
-      if (err) throw err;
-      console.log('> Ready on http://localhost:3000');
-    });
-  })
-  .catch(ex => {
-    console.log(ex.stack);
-    process.exit(1);
+    switch (pathname) {
+      case '/auth':
+        app.render(req, res, '/auth', query);
+        break;
+      case '/logout':
+        app.render(req, res, '/auth/logout', query);
+        break;
+      case '/user/show':
+        app.render(req, res, '/user/show', query);
+        break;
+      case '/user/new':
+        app.render(req, res, '/user/new', query);
+        break;
+      case '/user/update':
+        app.render(req, res, '/user/update', query);
+        break;
+      default:
+        handle(req, res, parsedUrl);
+        break;
+    }
+  }).listen(port, err => {
+    if (err) throw err;
+    console.log(`> Ready on http://localhost:${port}`);
   });
+});

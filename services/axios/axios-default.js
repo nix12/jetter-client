@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: 'https://kong-api-gateway-99521.herokuapp.com',
   params: { jwt: process.env.KONG_JWT }
 });
 
