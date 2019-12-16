@@ -1,3 +1,54 @@
+// const { parse } = require('url');
+// const match = require('micro-route/match');
+// const { send } = require('micro');
+// const cors = require('micro-cors')();
+// const next = require('next');
+
+// const dev = process.env.NODE_ENV !== 'production';
+
+// const app = next({ dev });
+// const handle = app.getRequestHandler();
+
+// const isAuth = req => match(req, '/login');
+// const isUser = req => match(req, '/user/:username');
+
+// function main(req, res) {
+//   const parsedUrl = parse(req.url, true);
+//   const { params, query } = parsedUrl;
+
+//   // console.log('parsedUrl', parsedUrl);
+//   // console.log('isAuth', isAuth);
+//   // console.log('isAuth req', isAuth(req));
+
+//   console.log('query', query);
+
+//   // console.log('APP PREPARED');
+//   // console.log('REQ', req);
+
+//   console.log('REQUEST METHOD', req.method);
+//   console.log('REQUEST HEADER', req.headers);
+//   // if (req.method === 'OPTIONS') {
+//   //   return send(res, 200);
+//   // }
+
+//   if (isAuth(req)) {
+//     return app.render(req, res, '/auth', query);
+//   }
+
+//   if (isUser(req)) {
+//     return app.render(req, res, '/user', query);
+//   }
+
+//   return handle(req, res, parsedUrl);
+// }
+
+// async function setup(handler) {
+//   await app.prepare();
+//   return handler;
+// }
+
+// module.exports = setup(main);
+
 const { createServer } = require('http');
 const { parse } = require('url');
 const next = require('next');
@@ -12,27 +63,10 @@ app.prepare().then(() => {
     const parsedUrl = parse(req.url, true);
     const { pathname, query } = parsedUrl;
 
-    console.log('parsedUser', parsedUrl);
-
-    switch (pathname) {
-      case '/auth':
-        app.render(req, res, '/auth', query);
-        break;
-      case '/logout':
-        app.render(req, res, '/auth/logout', query);
-        break;
-      case '/user/show':
-        app.render(req, res, '/user/show', query);
-        break;
-      case '/user/new':
-        app.render(req, res, '/user/new', query);
-        break;
-      case '/user/update':
-        app.render(req, res, '/user/update', query);
-        break;
-      default:
-        handle(req, res, parsedUrl);
-        break;
+    if (pathname === '/login') {
+      app.render(req, res, '/auth', query);
+    } else {
+      handle(req, res, parsedUrl);
     }
   }).listen(port, err => {
     if (err) throw err;

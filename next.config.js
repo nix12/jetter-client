@@ -8,7 +8,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 module.exports = withBundleAnalyzer({
   webpack(config) {
     config.plugins.push(new webpack.EnvironmentPlugin(localEnv));
-    
+
     return config;
   }
 });

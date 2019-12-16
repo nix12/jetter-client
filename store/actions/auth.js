@@ -71,13 +71,19 @@ export const auth = (username, password) => dispatch => {
     username,
     password,
     grant_type: 'password',
-    client_id: process.env.CLIENT_ID,
-    client_secret: process.env.CLIENT_SECRET
+    client_id:
+      process.env.NODE_ENV === 'development'
+        ? process.env.CLIENT_ID
+        : process.env.PRODUCTION_CLIENT_ID,
+    client_secret:
+      process.env.NODE_ENV === 'development'
+        ? process.env.CLIENT_SECRET
+        : process.env.PRODUCTION_CLIENT_SECRET
   };
 
-  const url = '/oauth/token';
+  const url = `/oauth/token`;
 
-  axios
+  return axios
     .post(url, authData)
     .then(response => {
       const token = response.data.access_token;

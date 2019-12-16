@@ -3,7 +3,7 @@ import React from 'react';
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
-import App, { Container } from 'next/app';
+import App from 'next/app';
 import Head from 'next/head';
 import withRedux from 'next-redux-wrapper';
 import Cookies from 'universal-cookie';
@@ -36,13 +36,13 @@ class MyApp extends App {
       ? await Component.getInitialProps(ctx)
       : {};
 
-    if (typeof cookies.get('token') === 'undefined') {
-      if (ctx.pathname === '/auth' || ctx.pathname === '/user/new') {
-        return { pageProps };
-      }
-      redirectTo('/auth', '/login', { res: ctx.res, status: 301 });
-    } else {
-    }
+    // if (typeof cookies.get('token') === 'undefined') {
+    //   if (ctx.pathname === '/auth' || ctx.pathname === '/user/new') {
+    //     return { pageProps };
+    //   }
+    //   redirectTo('/auth', '/login', { res: ctx.res, status: 301 });
+    // } else {
+    // }
 
     return { pageProps };
   }
@@ -58,20 +58,18 @@ class MyApp extends App {
   render() {
     const { Component, pageProps, store } = this.props;
     return (
-      <Container>
-        <Provider store={store}>
-          <Head>
-            <title>Jetter</title>
-          </Head>
-          <ThemeProvider theme={DefaultTheme}>
-            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-            <CssBaseline />
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </ThemeProvider>
-        </Provider>
-      </Container>
+      <Provider store={store}>
+        <Head>
+          <title>Jetter</title>
+        </Head>
+        <ThemeProvider theme={DefaultTheme}>
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <CssBaseline />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ThemeProvider>
+      </Provider>
     );
   }
 }
