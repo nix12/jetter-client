@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 import axios from '../../../services/axios/axios-forum';
 
 const useStyles = makeStyles({
@@ -11,7 +11,8 @@ const useStyles = makeStyles({
   }
 });
 
-const jetList = () => {
+const jetList = props => {
+  const { setLoading } = props;
   const classes = useStyles();
   const [list, setList] = useState([]);
 
@@ -23,6 +24,7 @@ const jetList = () => {
     };
 
     fetchJetList();
+    setLoading(false);
   }, []);
 
   const jets = list.map((post, index) => {

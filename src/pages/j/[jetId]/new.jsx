@@ -2,21 +2,22 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
-import Button from '../../components/UI/Button/Button';
-import Input from '../../components/UI/Input/Input';
-import { updateObject, checkValidity } from '../../shared/utility';
-import { createJet } from '../../store/actions/index';
+import Button from '../../../components/UI/Button/Button';
+import Input from '../../../components/UI/Input/Input';
+
+import { updateObject, checkValidity } from '../../../shared/utility';
+import { createPost } from '../../../store/actions/index';
 
 const newJet = props => {
   const { error } = props;
 
   const [form, setForm] = useState({
     controls: {
-      name: {
+      title: {
         elementType: 'input',
         elementConfig: {
           type: 'text',
-          placeholder: 'Name'
+          placeholder: 'Title'
         },
         value: '',
         validation: {
@@ -26,11 +27,13 @@ const newJet = props => {
         valid: false,
         touched: false
       },
-      description: {
-        elementType: 'input',
+      body: {
+        elementType: 'textarea',
         elementConfig: {
           type: 'text',
-          placeholder: 'Description'
+          placeholder: 'Body',
+          rowsMin: '20',
+          cols: '80'
         },
         value: '',
         validation: {
@@ -64,11 +67,13 @@ const newJet = props => {
   const submitHandler = event => {
     event.preventDefault();
 
+    const { jetId } = router.query;
+
     dispatch(
-      createJet(form.controls.name.value, form.controls.description.value)
+      createPost(form.controls.title.value, form.controls.body.value, jetId)
     ).then(response => {
       if (response.status === 201) {
-        router.push('/j/[jetId]', `/j/${form.controls.name.value}`);
+        router.push('/j/[jetId]', `/j/${jetId}`);
       }
     });
   };
@@ -114,7 +119,7 @@ const newJet = props => {
 
   return (
     <div>
-      <h1>New Jet</h1>
+      <h1>New Post</h1>
 
       <div>
         {errorMessage}

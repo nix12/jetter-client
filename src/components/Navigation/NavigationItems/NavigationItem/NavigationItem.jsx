@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import Link from 'next/link';
 
 import MenuItem from '@material-ui/core/MenuItem';
 
-const navigationItem = React.forwardRef((props, ref) => {
+const navigationItem = forwardRef((props, ref) => {
   const { children, link, click, linkAs } = props;
 
   return (

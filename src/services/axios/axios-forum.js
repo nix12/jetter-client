@@ -20,8 +20,7 @@ const instance = axios.create({
   withCredentials: true,
   headers: {
     Authorization: `Bearer ${token}`,
-    access_token: token || '',
-    'Cache-Control': 'no-store'
+    access_token: token || ''
   }
 });
 

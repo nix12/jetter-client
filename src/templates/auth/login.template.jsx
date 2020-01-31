@@ -113,7 +113,7 @@ class Template extends Component {
           {errorMessage}
           <form onSubmit={this.submitHandler}>
             {form}
-            <Button>Submit</Button>
+            <Button type="submit">Submit</Button>
           </form>
         </div>
 

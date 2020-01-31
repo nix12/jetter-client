@@ -2,35 +2,25 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
-import Button from '../../components/UI/Button/Button';
-import Input from '../../components/UI/Input/Input';
+import Input from '../UI/Input/Input';
+import Button from '../UI/Button/Button';
 import { updateObject, checkValidity } from '../../shared/utility';
-import { createJet } from '../../store/actions/index';
+import { createComment } from '../../store/actions/index';
 
-const newJet = props => {
-  const { error } = props;
+const commentForm = props => {
+  const { commentId, setUpdateComment, toggle, setToggle, rows, cols } = props;
+
+  const router = useRouter();
+  const dispatch = useDispatch();
 
   const [form, setForm] = useState({
     controls: {
-      name: {
-        elementType: 'input',
+      body: {
+        elementType: 'textarea',
         elementConfig: {
           type: 'text',
-          placeholder: 'Name'
-        },
-        value: '',
-        validation: {
-          required: true,
-          minLength: 3
-        },
-        valid: false,
-        touched: false
-      },
-      description: {
-        elementType: 'input',
-        elementConfig: {
-          type: 'text',
-          placeholder: 'Description'
+          rowsMin: rows,
+          cols
         },
         value: '',
         validation: {
@@ -42,9 +32,6 @@ const newJet = props => {
       }
     }
   });
-
-  const router = useRouter();
-  const dispatch = useDispatch();
 
   const inputChangedHandler = (event, controlName) => {
     const updatedControls = updateObject(form.controls, {
@@ -64,11 +51,21 @@ const newJet = props => {
   const submitHandler = event => {
     event.preventDefault();
 
+    const { jetId, postId } = router.query;
+
     dispatch(
-      createJet(form.controls.name.value, form.controls.description.value)
+      createComment(
+        form.controls.body.value,
+        jetId,
+        postId,
+        commentId || postId,
+        commentId ? 'Comment' : 'Post',
+        commentId || null
+      )
     ).then(response => {
       if (response.status === 201) {
-        router.push('/j/[jetId]', `/j/${form.controls.name.value}`);
+        setUpdateComment(true);
+        form.controls.body.value = '';
       }
     });
   };
@@ -95,36 +92,17 @@ const newJet = props => {
     />
   ));
 
-  let errorMessage = null;
-
-  if (error) {
-    Object.entries(error).map(([key, value]) => {
-      const field = key.charAt(0).toUpperCase() + key.slice(1);
-
-      errorMessage = (
-        <div>
-          <span>{field}</span>
-          <span>{value}</span>
-        </div>
-      );
-
-      return errorMessage;
-    });
-  }
-
-  return (
-    <div>
-      <h1>New Jet</h1>
-
-      <div>
-        {errorMessage}
-        <form onSubmit={submitHandler}>
-          {formOutput}
-          <Button type="submit">Submit</Button>
-        </form>
-      </div>
-    </div>
-  );
+  return toggle ? (
+    <form onSubmit={submitHandler}>
+      {formOutput}
+      <Button type="submit">Submit</Button>
+      {commentId ? (
+        <Button type="button" clicked={() => setToggle(false)}>
+          Cancel
+        </Button>
+      ) : null}
+    </form>
+  ) : null;
 };
 
-export default newJet;
+export default commentForm;

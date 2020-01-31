@@ -10,6 +10,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import ArrowUp from '@material-ui/icons/ArrowUpward';
 import ArrowDown from '@material-ui/icons/ArrowDownward';
+import Divider from '@material-ui/core/Divider';
 
 import axios from '../../../services/axios/axios-forum';
 
@@ -54,15 +55,19 @@ const post = props => {
     createdAt,
     score,
     jetId,
-    hashId,
+    postId,
     title,
-    setUpdatePosts
+    body,
+    comments,
+    setUpdatePost
   } = props;
 
-  const upvote = (jet, id) => axios.put(`/api/jets/${jet}/posts/${id}/upvote`);
-  const downvote = (jet, id) =>
-    axios.put(`/api/jets/${jet}/posts/${id}/downvote`);
-  const unvote = (jet, id) => axios.put(`/api/jets/${jet}/posts/${id}/unvote`);
+  const upvote = (jet, post) =>
+    axios.put(`/api/jets/${jet}/posts/${post}/upvote`);
+  const downvote = (jet, post) =>
+    axios.put(`/api/jets/${jet}/posts/${post}/downvote`);
+  const unvote = (jet, post) =>
+    axios.put(`/api/jets/${jet}/posts/${post}/unvote`);
 
   const classes = useStyles();
   const now = new Moment();
@@ -72,36 +77,61 @@ const post = props => {
   const [up, setUpvote] = useState(false);
   const [down, setDownvote] = useState(false);
 
-  const upvoted = async (jet, id) => {
+  const upvoted = async (jet, post) => {
     if (up) {
-      await unvote(jet, id).then(() => setUpvote(false));
+      await unvote(jet, post).then(() => setUpvote(false));
     } else {
-      await upvote(jet, id).then(() => setUpvote(true));
+      await upvote(jet, post).then(() => setUpvote(true));
     }
 
-    setUpdatePosts(true);
+    setUpdatePost(true);
   };
 
-  const downvoted = (jet, id) => {
+  const downvoted = async (jet, post) => {
     if (down) {
-      setDownvote(false);
-      unvote(jet, id);
+      await unvote(jet, post).then(() => setDownvote(false));
     } else {
-      setDownvote(true);
-      downvote(jet, id);
+      await downvote(jet, post).then(() => setDownvote(true));
     }
+
+    setUpdatePost(true);
+  };
+
+  const switchVote = async (jet, post) => {
+    await unvote(jet, post).then(() => {
+      setUpvote(false);
+      setDownvote(false);
+    });
+
+    if (up) {
+      downvoted(jet, post);
+    }
+
+    if (down) {
+      upvoted(jet, post);
+    }
+
+    setUpdatePost(true);
   };
 
   return (
     <Card className={classes.card}>
       <div className={classes.votes}>
         <ArrowUp
-          onClick={() => upvoted(jetId, hashId)}
+          onClick={
+            !down
+              ? () => upvoted(jetId, postId)
+              : () => switchVote(jetId, postId)
+          }
           className={up ? classes.voted : ''}
         />
         <div className={classes.score}>{score}</div>
         <ArrowDown
-          onClick={() => downvoted(jetId, hashId)}
+          onClick={
+            !up
+              ? () => downvoted(jetId, postId)
+              : () => switchVote(jetId, postId)
+          }
           className={down ? classes.voted : ''}
         />
       </div>
@@ -112,7 +142,7 @@ const post = props => {
             color="textSecondary"
             gutterBottom
           >
-            <Link href="/j/[jetId]" as={`/j/${jetId}`}>
+            <Link href="/j/[jetpost]" as={`/j/${jetId}`}>
               <span className={classes.jet}>
                 j/
                 {jetId}
@@ -129,12 +159,32 @@ const post = props => {
             {duration}
             &nbsp;ago
           </Typography>
+          <Link href="/j/[jetId]/[postId]" as={`/j/${jetId}/${postId}`}>
+            <a style={{ textDecoration: 'none' }}>
+              <Typography variant="h6" component="p">
+                {title}
+              </Typography>
+            </a>
+          </Link>
+          {body ? <Divider /> : null}
           <Typography variant="h6" component="p">
-            {title}
+            {body}
           </Typography>
         </CardContent>
         <CardActions>
-          <Button size="small">comments</Button>
+          <Link href="/j/[jetId]/[postId]" as={`/j/${jetId}/${postId}`}>
+            <Button size="small">
+              <span>{comments}</span>
+              &nbsp;comments
+            </Button>
+          </Link>
+          <Link
+            href="/j/[jetId]/[postId]/edit"
+            as={`/j/${jetId}/${postId}/edit`}
+          >
+            <Button size="small">edit</Button>
+          </Link>
+          <Button size="small">delete</Button>
         </CardActions>
       </div>
     </Card>

@@ -1,33 +1,42 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
-import axios from '../../../services/axios/axios-forum';
 
+import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import Post from '../../../components/UI/Post/Post';
+
+import axios from '../../../services/axios/axios-forum';
 
 const jet = props => {
   const { jetData } = props;
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState(jetData);
   const [update, setUpdatePosts] = useState(false);
   const router = useRouter();
-  console.log('ROUTER', router.query);
   const { jetId } = router.query;
+  let posts;
 
-  const posts = data.map(post => (
-    <Post
-      key={post.hash_id}
-      body={post.body}
-      comments={post.comments_count}
-      createdAt={post.created_at}
-      hashId={post.hash_id}
-      jetId={post.jet_id}
-      title={post.title}
-      updatedAt={post.updated_at}
-      username={post.voter_id}
-      score={post.cached_votes_score}
-      setUpdatePosts={setUpdatePosts}
-    />
-  ));
+  if (loading) {
+    posts = <CircularProgress />;
+  } else if (!_.isEmpty(data)) {
+    posts = data.map(post => (
+      <Post
+        key={post.hash_id}
+        comments={post.comments_count}
+        createdAt={post.created_at}
+        postId={post.hash_id}
+        jetId={post.jet_id}
+        title={post.title}
+        body={post.body}
+        updatedAt={post.updated_at}
+        username={post.voter_id}
+        score={post.cached_votes_score}
+        setUpdatePosts={setUpdatePosts}
+      />
+    ));
+  } else {
+    posts = <p>No posts found.</p>;
+  }
 
   const usePrevious = value => {
     const ref = useRef();
@@ -43,9 +52,10 @@ const jet = props => {
 
     useEffect(() => {
       const fetchJet = async () => {
-        const jetData = await axios.get(`/api/jets/${jetId}`);
+        const jetPosts = await axios.get(`/api/jets/${jetId}`);
 
-        updateCurrent(jetData.data);
+        updateCurrent(jetPosts.data);
+        setData(jetPosts.data);
 
         if (update) {
           setUpdatePosts(false);
@@ -57,21 +67,21 @@ const jet = props => {
       }
 
       fetchJet();
-    }, [update]);
+      setLoading(false);
+    }, [update, jetId]);
   };
 
   useDeepComparison(jetData);
 
-  return data.length > 0 ? posts : <p>No posts found.</p>;
+  return posts;
 };
 
 jet.getInitialProps = async ({ query }) => {
-  console.log('QUERY', query);
   const { jetId } = query;
   const url = `/api/jets/${jetId}`;
-  const jet = await axios.get(url);
+  const jetPosts = await axios.get(url);
 
-  return { jetData: jet.data };
+  return { jetData: jetPosts.data };
 };
 
 export default jet;

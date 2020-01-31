@@ -1,5 +1,8 @@
 import React from 'react';
 
+import Input from '@material-ui/core/Input/Input';
+import TextareaAutosize from '@material-ui/core/TextareaAutosize';
+
 const input = props => {
   const { elementConfig, elementType, value, name, changed } = props;
   let inputElement = null;
@@ -7,7 +10,7 @@ const input = props => {
   switch (elementType) {
     case 'input':
       inputElement = (
-        <input
+        <Input
           {...elementConfig}
           value={value}
           onChange={changed}
@@ -17,12 +20,22 @@ const input = props => {
       break;
     case 'textarea':
       inputElement = (
-        <textarea {...elementConfig} value={value} onChange={changed} />
+        <TextareaAutosize
+          {...elementConfig}
+          className="size"
+          value={value}
+          onChange={changed}
+        />
       );
       break;
     default:
       inputElement = (
-        <input {...elementConfig} value={value} onChange={changed} />
+        <Input
+          {...elementConfig}
+          value={value}
+          onChange={changed}
+          name={name}
+        />
       );
   }
 

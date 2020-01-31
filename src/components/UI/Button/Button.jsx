@@ -1,13 +1,21 @@
 /* eslint-disable react/button-has-type */
 import React from 'react';
 
+import Button from '@material-ui/core/Button/Button';
+
 const button = props => {
   const { children, clicked, disabled, type } = props;
 
   return (
-    <button onClick={clicked} disabled={disabled} type={type}>
+    <Button
+      onClick={clicked}
+      disabled={disabled}
+      variant="contained"
+      color="inherit"
+      type={type}
+    >
       {children}
-    </button>
+    </Button>
   );
 };
 

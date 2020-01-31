@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
-import Button from '../../components/UI/Button/Button';
-import Input from '../../components/UI/Input/Input';
-import { updateObject, checkValidity } from '../../shared/utility';
-import { createJet } from '../../store/actions/index';
+import Button from '../../../../components/UI/Button/Button';
+import Input from '../../../../components/UI/Input/Input';
 
-const newJet = props => {
+import { updateObject, checkValidity } from '../../../../shared/utility';
+import { updatePost } from '../../../../store/actions/index';
+
+import axios from '../../../../services/axios/axios-forum';
+
+const editPost = props => {
   const { error } = props;
 
   const [form, setForm] = useState({
     controls: {
-      name: {
+      title: {
         elementType: 'input',
         elementConfig: {
           type: 'text',
-          placeholder: 'Name'
+          placeholder: 'Title'
         },
         value: '',
         validation: {
@@ -26,11 +29,13 @@ const newJet = props => {
         valid: false,
         touched: false
       },
-      description: {
-        elementType: 'input',
+      body: {
+        elementType: 'textarea',
         elementConfig: {
           type: 'text',
-          placeholder: 'Description'
+          placeholder: 'Body',
+          rowsMin: '20',
+          cols: '80'
         },
         value: '',
         validation: {
@@ -45,6 +50,23 @@ const newJet = props => {
 
   const router = useRouter();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      const { jetId, postId } = router.query;
+      const postData = await axios.get(`/api/jets/${jetId}/posts/${postId}`);
+      console.log('jetId', jetId);
+      console.log('postId', postId);
+      setForm({
+        controls: {
+          title: { value: postData.data.post.title },
+          body: { value: postData.data.post.body }
+        }
+      });
+    };
+
+    fetchPost();
+  }, []);
 
   const inputChangedHandler = (event, controlName) => {
     const updatedControls = updateObject(form.controls, {
@@ -64,11 +86,18 @@ const newJet = props => {
   const submitHandler = event => {
     event.preventDefault();
 
+    const { jetId, postId } = router.query;
+
     dispatch(
-      createJet(form.controls.name.value, form.controls.description.value)
+      updatePost(
+        form.controls.title.value,
+        form.controls.body.value,
+        jetId,
+        postId
+      )
     ).then(response => {
       if (response.status === 201) {
-        router.push('/j/[jetId]', `/j/${form.controls.name.value}`);
+        router.push('/j/[jetId]/[postId]', `/j/${jetId}/${postId}`);
       }
     });
   };
@@ -114,7 +143,7 @@ const newJet = props => {
 
   return (
     <div>
-      <h1>New Jet</h1>
+      <h1>New Post</h1>
 
       <div>
         {errorMessage}
@@ -127,4 +156,4 @@ const newJet = props => {
   );
 };
 
-export default newJet;
+export default editPost;
