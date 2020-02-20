@@ -20,12 +20,7 @@ const input = props => {
       break;
     case 'textarea':
       inputElement = (
-        <TextareaAutosize
-          {...elementConfig}
-          className="size"
-          value={value}
-          onChange={changed}
-        />
+        <TextareaAutosize {...elementConfig} value={value} onChange={changed} />
       );
       break;
     default:

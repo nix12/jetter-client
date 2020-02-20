@@ -1,5 +1,5 @@
-const { parsed: localEnv } = require('dotenv').config();
-const webpack = require('webpack');
+require('dotenv').config();
+require('webpack');
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true'
@@ -7,8 +7,12 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 module.exports = withBundleAnalyzer({
   webpack(config) {
-    config.plugins.push(new webpack.EnvironmentPlugin(localEnv));
-
     return config;
+  },
+  env: {
+    CLIENT_ID: process.env.CLIENT_ID,
+    CLIENT_SECRET: process.env.CLIENT_SECRET,
+    PRODUCTION_CLIENT_ID: process.env.PRODUCTION_CLIENT_ID,
+    PRODUCTION_CLIENT_SECRET: process.env.PRODUCTION_CLIENT_SECRET
   }
 });

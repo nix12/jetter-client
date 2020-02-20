@@ -11,7 +11,7 @@ const useStyles = makeStyles({
   }
 });
 
-const jetList = props => {
+const JetList = props => {
   const { setLoading } = props;
   const classes = useStyles();
   const [list, setList] = useState([]);
@@ -28,19 +28,21 @@ const jetList = props => {
   }, []);
 
   const jets = list.map((post, index) => {
-    const separator = index <= 9 ? <span>|</span> : null;
+    const separator = index <= 6 ? <span>|</span> : null;
 
-    return (
-      <div key={post.id} className={classes.center}>
-        <Link href="/j/[jetId]" as={`/j/${post.name}`}>
-          <Button>{post.name}</Button>
-        </Link>
-        {separator}
-      </div>
-    );
+    while (index <= 8) {
+      return (
+        <div key={post.id} className={classes.center}>
+          <Link href="/j/[jetId]" as={`/j/${post.name}`}>
+            <Button>{post.name}</Button>
+          </Link>
+          {separator}
+        </div>
+      );
+    }
   });
 
   return jets;
 };
 
-export default jetList;
+export default JetList;

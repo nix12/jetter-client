@@ -2,7 +2,7 @@ import Cookies from 'universal-cookie';
 import jwtDecode from 'jwt-decode';
 import axios from '../../services/axios/axios-user';
 import * as actionTypes from './actionTypes';
-import ability from '../../services/casl/ability';
+import { defineRulesFor, ability } from '../../services/casl/ability';
 
 export const authStart = () => {
   return {
@@ -10,11 +10,13 @@ export const authStart = () => {
   };
 };
 
-export const authSuccess = (userId, username) => {
+export const authSuccess = (userId, username, roles, rules) => {
   return {
     type: actionTypes.AUTH_SUCCESS,
     userId,
-    username
+    username,
+    roles,
+    rules
   };
 };
 
@@ -53,18 +55,34 @@ export const logout = () => dispatch => {
   const token = cookies.get('token');
 
   const tokenData = {
-    token
+    token,
+    client_id:
+      process.env.NODE_ENV !== 'production'
+        ? process.env.CLIENT_ID
+        : process.env.PRODUCTION_CLIENT_ID,
+    client_secret:
+      process.env.NODE_ENV !== 'production'
+        ? process.env.CLIENT_SECRET
+        : process.env.PRODUCTION_CLIENT_SECRET
   };
+
   if (token) {
-    axios.post(url, tokenData).catch(err => console.log(err));
+    return axios
+      .post(url, tokenData)
+      .then(response => {
+        removeCookie();
+        ability.update([]);
+        dispatch(authLogout());
+
+        return response;
+      })
+      .catch(err => console.log(err));
   }
 
-  removeCookie();
-  ability.update([]);
   dispatch(authLogout());
 };
 
-export const auth = (username, password) => dispatch => {
+export const auth = (username, password) => (dispatch, getState) => {
   dispatch(authStart());
 
   const authData = {
@@ -90,11 +108,19 @@ export const auth = (username, password) => dispatch => {
       const data = jwtDecode(token);
 
       setCookie(token, response.data.expires_in);
-      ability.update(data.rules);
+      defineRulesFor(data.user);
 
-      dispatch(authSuccess(data.id, data.username));
+      dispatch(
+        authSuccess(
+          data.user.id,
+          data.user.username,
+          data.user.roles,
+          data.user.rules
+        )
+      );
     })
     .catch(err => {
+      console.log('[Auth Failure]', err);
       dispatch(authFail(err.response.data.errors));
     });
 };
@@ -112,9 +138,16 @@ export const authCheckState = () => dispatch => {
     if (expirationDate < new Date().getTime()) {
       dispatch(logout());
     } else {
-      ability.update(data.rules);
+      defineRulesFor(data.user);
 
-      dispatch(authSuccess(data.userId, data.username));
+      dispatch(
+        authSuccess(
+          data.user.userId,
+          data.user.username,
+          data.user.roles,
+          data.user.rules
+        )
+      );
     }
   }
 };

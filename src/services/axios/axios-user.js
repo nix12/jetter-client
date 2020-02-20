@@ -1,7 +1,4 @@
 import axios from 'axios';
-import Cookies from 'universal-cookie';
-
-const cookies = new Cookies();
 
 const instance = axios.create({
   baseURL:
@@ -15,10 +12,6 @@ const instance = axios.create({
       process.env.NODE_ENV !== 'production'
         ? process.env.KONG_JWT
         : process.env.PRODUCTION_KONG_JWT
-  },
-  withCredentials: true,
-  headers: {
-    Authorization: `Bearer ${cookies.get('token')}`
   }
 });
 

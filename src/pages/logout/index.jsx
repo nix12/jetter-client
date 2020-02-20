@@ -1,23 +1,23 @@
-import React, { Component } from 'react';
-import { withRouter } from 'next/router';
-import { connect } from 'react-redux';
-import * as actions from '../../store/actions/index';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../store/actions/index';
 
-import Template from '../../templates/auth/logout.template';
+const Logout = () => {
+  const dispatch = useDispatch();
+  const router = useRouter();
 
-class Logout extends Component {
-  render() {
-    return <Template {...this.props} />;
-  }
-}
+  useEffect(() => {
+    dispatch(logout())
+      .then(response => {
+        if (response.status === 200) {
+          router.push('/login');
+        }
+      })
+      .catch(router.push('/'));
+  }, []);
 
-const mapDispatchToProps = dispatch => ({
-  onLogout: () => dispatch(actions.logout())
-});
+  return null;
+};
 
-export default withRouter(
-  connect(
-    null,
-    mapDispatchToProps
-  )(Logout)
-);
+export default Logout;

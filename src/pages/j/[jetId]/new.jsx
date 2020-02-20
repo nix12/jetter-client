@@ -8,7 +8,7 @@ import Input from '../../../components/UI/Input/Input';
 import { updateObject, checkValidity } from '../../../shared/utility';
 import { createPost } from '../../../store/actions/index';
 
-const newJet = props => {
+const newPost = props => {
   const { error } = props;
 
   const [form, setForm] = useState({
@@ -132,4 +132,4 @@ const newJet = props => {
   );
 };
 
-export default newJet;
+export default newPost;

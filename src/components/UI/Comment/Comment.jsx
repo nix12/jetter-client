@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import Moment from 'moment';
+import Cookies from 'universal-cookie';
+import jwtDecode from 'jwt-decode';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -14,6 +17,7 @@ import Divider from '@material-ui/core/Divider';
 import CommentForm from '../../Forms/Comment';
 import Button from '../Button/Button';
 import axios from '../../../services/axios/axios-forum';
+import Can from '../../Permissions/Can';
 
 const useStyles = makeStyles({
   card: {
@@ -49,6 +53,7 @@ const useStyles = makeStyles({
 
 const comment = props => {
   const {
+    comment,
     username,
     createdAt,
     score,
@@ -66,15 +71,24 @@ const comment = props => {
     axios.put(`/api/jets/${jet}/posts/${post}/comments/${comment}/downvote`);
   const unvote = (jet, post, comment) =>
     axios.put(`/api/jets/${jet}/posts/${post}/comments/${comment}/unvote`);
-
+  const [toggleReply, setToggleReply] = useState(false);
   const [up, setUpvote] = useState(false);
   const [down, setDownvote] = useState(false);
-  const [toggleReply, setToggleReply] = useState(false);
+
+  const [toggleEdit, setToggleEdit] = useState(false);
+
+  const isLoggedIn = useSelector(state => state.auth.currentUser.isLoggedIn);
 
   const classes = useStyles();
   const now = new Moment();
   const created = new Moment(createdAt);
   const duration = Moment.duration(created.diff(now)).humanize();
+  const cookies = new Cookies();
+  const token = cookies.get('token');
+  let userInfo;
+  if (token) {
+    userInfo = jwtDecode(token);
+  }
 
   const upvoted = async (jet, post, comment) => {
     if (up) {
@@ -135,35 +149,56 @@ const comment = props => {
               className={down ? classes.voted : ''}
             />
           </div>
-          <div>
-            <CardContent>
-              <Typography
-                className={classes.info}
-                color="textSecondary"
-                gutterBottom
-              >
-                <Link href="/user/[username]" as={`/user/${username}`}>
-                  <span className={classes.user}>{username}</span>
-                </Link>
-                &nbsp;
-                {score}
-                &nbsp;points&nbsp;
-                {duration}
-                &nbsp;ago
-              </Typography>
-              <Divider />
-              <Typography variant="h6" component="p">
-                {body}
-              </Typography>
-            </CardContent>
-            <CardActions>
-              <Button size="small" clicked={() => setToggleReply(true)}>
-                reply
-              </Button>
-              <Button size="small">edit</Button>
-              <Button size="small">delete</Button>
-            </CardActions>
-          </div>
+          {toggleEdit ? (
+            <CommentForm
+              commentId={commentId}
+              setUpdateComment={setUpdateComment}
+              rows="5"
+              cols="80"
+              value={body}
+              edit={toggleEdit}
+              setEdit={setToggleEdit}
+            />
+          ) : (
+            <div>
+              <CardContent>
+                <Typography
+                  className={classes.info}
+                  color="textSecondary"
+                  gutterBottom
+                >
+                  <Link href="/user/[username]" as={`/user/${username}`}>
+                    <span className={classes.user}>{username}</span>
+                  </Link>
+                  &nbsp;
+                  {score}
+                  &nbsp;points&nbsp;
+                  {duration}
+                  &nbsp;ago
+                </Typography>
+                <Divider />
+
+                <Typography variant="h6" component="p">
+                  {body}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                {isLoggedIn ? (
+                  <Button size="small" clicked={() => setToggleReply(true)}>
+                    reply
+                  </Button>
+                ) : null}
+                <Can do="update" on={comment}>
+                  <Button size="small" clicked={() => setToggleEdit(true)}>
+                    edit
+                  </Button>
+                </Can>
+                <Can do="delete" on={comment}>
+                  <Button size="small">delete</Button>
+                </Can>
+              </CardActions>
+            </div>
+          )}
         </Card>
         <CommentForm
           commentId={commentId}

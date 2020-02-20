@@ -9,12 +9,13 @@ import CommentForm from '../../../../components/Forms/Comment';
 
 import axios from '../../../../services/axios/axios-forum';
 
-const show = props => {
+const Show = props => {
   const { postData } = props;
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(postData);
   const [updatePost, setUpdatePost] = useState(false);
   const [updateComment, setUpdateComment] = useState(false);
+  const [toggleReply, setToggleReply] = useState(true);
   const router = useRouter();
   const { jetId, postId } = router.query;
   let comments;
@@ -23,6 +24,7 @@ const show = props => {
     return comment.map(child => (
       <Comment
         key={child.hash_id}
+        comment={{ __type: 'Comment', ...child }}
         body={child.body}
         comments={child.comments_count}
         createdAt={child.created_at}
@@ -82,6 +84,7 @@ const show = props => {
   return (
     <div>
       <Post
+        post={{ __type: 'Post', ...data.post }}
         body={data.post.body}
         comments={data.post.comments_count}
         createdAt={data.post.created_at}
@@ -96,7 +99,8 @@ const show = props => {
       <CommentForm
         rows="15"
         cols="65"
-        toggle
+        setToggle={setToggleReply}
+        toggle={toggleReply}
         setUpdateComment={setUpdateComment}
       />
       {comments}
@@ -104,7 +108,7 @@ const show = props => {
   );
 };
 
-show.getInitialProps = async ({ query }) => {
+Show.getInitialProps = async ({ query }) => {
   const { jetId, postId } = query;
   const url = `/api/jets/${jetId}/posts/${postId}`;
   const post = await axios.get(url);
@@ -112,4 +116,4 @@ show.getInitialProps = async ({ query }) => {
   return { postData: post.data };
 };
 
-export default show;
+export default Show;

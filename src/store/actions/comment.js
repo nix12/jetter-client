@@ -24,5 +24,30 @@ export const createComment = (
     .catch(err => console.log(err.response.data.error));
 };
 
-export const updateComment = (title, description) => dispatch => {};
+export const updateComment = (
+  body,
+  jetId,
+  postId,
+  commentableId,
+  commentableType,
+  commentId
+) => dispatch => {
+  const commentData = {
+    comment: {
+      body,
+      post_id: postId,
+      commentable_id: commentableId,
+      commentable_type: commentableType
+    }
+  };
+
+  return axios
+    .patch(
+      `/api/jets/${jetId}/posts/${postId}/comments/${commentId}`,
+      commentData
+    )
+    .then(response => response)
+    .catch(err => console.log(err.response.data.error));
+};
+
 export const deleteComment = postId => dispatch => {};

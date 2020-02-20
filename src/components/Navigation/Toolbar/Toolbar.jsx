@@ -171,7 +171,7 @@ const toolbar = props => {
 
   const loggedOutNav = (
     <div>
-      <Link href="/user/new" as="/signup">
+      <Link href="/signup">
         <Button color="inherit">Sign Up</Button>
       </Link>
 
@@ -217,6 +217,11 @@ const toolbar = props => {
               />
             </div>
             <div className={classes.grow} />
+            <div>
+              <Link href="/jets">
+                <Button>Jets</Button>
+              </Link>
+            </div>
             <div className={classes.sectionDesktop}>
               {loggedIn ? loggedInNav : loggedOutNav}
             </div>

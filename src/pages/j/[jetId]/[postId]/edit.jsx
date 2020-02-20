@@ -55,14 +55,21 @@ const editPost = props => {
     const fetchPost = async () => {
       const { jetId, postId } = router.query;
       const postData = await axios.get(`/api/jets/${jetId}/posts/${postId}`);
-      console.log('jetId', jetId);
-      console.log('postId', postId);
-      setForm({
+
+      setForm(prevState => ({
+        ...prevState,
         controls: {
-          title: { value: postData.data.post.title },
-          body: { value: postData.data.post.body }
+          ...prevState.controls,
+          title: {
+            ...prevState.title,
+            value: postData.data.post.title
+          },
+          body: {
+            ...prevState.body,
+            value: postData.data.post.body
+          }
         }
-      });
+      }));
     };
 
     fetchPost();
@@ -96,7 +103,7 @@ const editPost = props => {
         postId
       )
     ).then(response => {
-      if (response.status === 201) {
+      if (response.status === 204) {
         router.push('/j/[jetId]/[postId]', `/j/${jetId}/${postId}`);
       }
     });

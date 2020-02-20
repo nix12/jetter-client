@@ -1,13 +1,22 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-import Template from '../../templates/user/show.template';
+import Can from '../../components/Permissions/Can';
 
-const show = props => <Template {...props} />;
+const show = () => {
+  const username = useSelector(state => state.auth.currentUser.username);
+  const userId = useSelector(state => state.auth.currentUser.userId);
 
-const mapStateToProps = state => ({
-  userId: state.auth.currentUser.userId,
-  username: state.auth.currentUser.username
-});
+  return (
+    <div>
+      <h1>My Profile</h1>
 
-export default connect(mapStateToProps)(show);
+      {/* <Can I="read" this="User"> */}
+      <h1>{userId}</h1>
+      <h1>{`${username}'s Page`}</h1>
+      {/* </Can> */}
+    </div>
+  );
+};
+
+export default show;

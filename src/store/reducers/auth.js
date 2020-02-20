@@ -6,6 +6,8 @@ const initialState = {
     isLoggedIn: false,
     userId: null,
     username: null,
+    roles: [],
+    rules: null,
     loading: false,
     error: null
   }
@@ -26,6 +28,8 @@ export const authSuccess = (state, action) => {
       isLoggedIn: true,
       userId: action.userId,
       username: action.username,
+      roles: action.roles,
+      rules: action.rules,
       error: null,
       loading: false
     }
@@ -46,7 +50,9 @@ export const authLogout = (state, action) => {
     currentUser: {
       isLoggedIn: false,
       userId: null,
-      username: null
+      username: null,
+      roles: [],
+      rules: null
     }
   });
 };

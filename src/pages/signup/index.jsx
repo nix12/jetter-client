@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useRouter } from 'next/router';
+import { useDispatch, useSelector } from 'react-redux';
 
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import Input from '../../components/UI/Input/Input';
 import Button from '../../components/UI/Button/Button';
-import { ability } from '../../services/casl/ability';
 import { updateObject, checkValidity } from '../../shared/utility';
-import { auth } from '../../store/actions/index';
+import { register } from '../../store/actions/index';
 
-const Login = () => {
+const New = () => {
+  const error = useSelector(state => state.register.error);
+  const dispatch = useDispatch();
+  const router = useRouter();
+
   const [form, setForm] = useState({
     controls: {
       username: {
@@ -37,17 +40,23 @@ const Login = () => {
         },
         valid: false,
         touched: false
+      },
+      password_confirmation: {
+        elementType: 'input',
+        elementConfig: {
+          type: 'password',
+          placeholder: 'Password Confirmation'
+        },
+        value: '',
+        validation: {
+          required: true,
+          minLength: 6
+        },
+        valid: false,
+        touched: false
       }
     }
   });
-
-  const dispatch = useDispatch();
-
-  const username = useSelector(state => state.auth.currentUser.username);
-  const userId = useSelector(state => state.auth.currentUser.userId);
-  const roles = useSelector(state => state.auth.currentUser.roles);
-  const error = useSelector(state => state.auth.currentUser.error);
-  const loading = useSelector(state => state.auth.currentUser.loading);
 
   const inputChangedHandler = (event, controlName) => {
     const updatedControls = updateObject(form.controls, {
@@ -67,7 +76,22 @@ const Login = () => {
   const submitHandler = event => {
     event.preventDefault();
 
-    dispatch(auth(form.controls.username.value, form.controls.password.value));
+    dispatch(
+      register(
+        form.controls.username.value,
+        form.controls.password.value,
+        form.controls.password_confirmation.value
+      )
+    )
+      .then(() => {
+        if (!error) {
+          router.push('/');
+        }
+      })
+      .catch(err => {
+        console.log('err on register submitHandler', err);
+        console.log('props', this.props);
+      });
   };
 
   const formElementsArray = [];
@@ -78,7 +102,7 @@ const Login = () => {
     });
   });
 
-  let formOutput = formElementsArray.map(formElement => (
+  const outputForm = formElementsArray.map(formElement => (
     <Input
       key={formElement.id}
       elementType={formElement.config.elementType}
@@ -88,51 +112,40 @@ const Login = () => {
       shouldValidate={formElement.config.validation}
       touched={formElement.config.touched}
       changed={event => inputChangedHandler(event, formElement.id)}
+      name={formElement.id}
     />
   ));
-
-  if (loading) {
-    formOutput = <CircularProgress />;
-  }
 
   let errorMessage = null;
 
   if (error) {
-    errorMessage = <p>{error}</p>;
+    Object.entries(error).map(([key, value], i) => {
+      const field = key.charAt(0).toUpperCase() + key.slice(1);
+
+      errorMessage = (
+        <p>
+          <span>
+            {field}
+            {value}
+          </span>
+        </p>
+      );
+    });
   }
-
-  const rolesList = roles
-    ? roles.map((role, index) => (
-        <span key={index} style={{ display: 'block' }}>
-          role {role}
-        </span>
-      ))
-    : null;
-
-  const abilities = ability.rules.map((rule, index) => (
-    <span key={index} style={{ display: 'block' }}>
-      rules [{rule.actions}: {rule.subject}]
-    </span>
-  ));
 
   return (
     <div>
-      <h1>Auth</h1>
+      <h1>Sign Up</h1>
+
       <div>
         {errorMessage}
         <form onSubmit={submitHandler}>
-          {formOutput}
+          {outputForm}
           <Button type="submit">Submit</Button>
         </form>
-      </div>
-      <div>
-        <span style={{ display: 'block' }}>ID: {userId}</span>
-        <span style={{ display: 'block' }}>Username: {username}</span>
-        <span style={{ display: 'block' }}>{rolesList}</span>
-        {abilities}
       </div>
     </div>
   );
 };
 
-export default Login;
+export default New;

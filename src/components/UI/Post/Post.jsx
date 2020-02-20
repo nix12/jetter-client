@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Moment from 'moment';
+import Cookies from 'universal-cookie';
+import jwtDecode from 'jwt-decode';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -11,8 +13,11 @@ import Typography from '@material-ui/core/Typography';
 import ArrowUp from '@material-ui/icons/ArrowUpward';
 import ArrowDown from '@material-ui/icons/ArrowDownward';
 import Divider from '@material-ui/core/Divider';
+// import Button from '../Button/Button';
 
 import axios from '../../../services/axios/axios-forum';
+import Can from '../../Permissions/Can';
+// import { Can } from '../../../services/casl/ability-context';
 
 const useStyles = makeStyles({
   card: {
@@ -49,8 +54,9 @@ const useStyles = makeStyles({
   }
 });
 
-const post = props => {
+const Post = props => {
   const {
+    post,
     username,
     createdAt,
     score,
@@ -142,7 +148,7 @@ const post = props => {
             color="textSecondary"
             gutterBottom
           >
-            <Link href="/j/[jetpost]" as={`/j/${jetId}`}>
+            <Link href="/j/[jetId]" as={`/j/${jetId}`}>
               <span className={classes.jet}>
                 j/
                 {jetId}
@@ -178,17 +184,21 @@ const post = props => {
               &nbsp;comments
             </Button>
           </Link>
-          <Link
-            href="/j/[jetId]/[postId]/edit"
-            as={`/j/${jetId}/${postId}/edit`}
-          >
-            <Button size="small">edit</Button>
-          </Link>
-          <Button size="small">delete</Button>
+          <Can do="update" on={post}>
+            <Link
+              href="/j/[jetId]/[postId]/edit"
+              as={`/j/${jetId}/${postId}/edit`}
+            >
+              <Button size="small">edit</Button>
+            </Link>
+          </Can>
+          <Can do="delete" on={post}>
+            <Button size="small">delete</Button>
+          </Can>
         </CardActions>
       </div>
     </Card>
   );
 };
 
-export default post;
+export default Post;

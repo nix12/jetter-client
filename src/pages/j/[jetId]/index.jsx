@@ -11,7 +11,7 @@ const jet = props => {
   const { jetData } = props;
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(jetData);
-  const [update, setUpdatePosts] = useState(false);
+  const [updatePost, setUpdatePost] = useState(false);
   const router = useRouter();
   const { jetId } = router.query;
   let posts;
@@ -22,6 +22,7 @@ const jet = props => {
     posts = data.map(post => (
       <Post
         key={post.hash_id}
+        post={{ __type: 'Post', ...post }}
         comments={post.comments_count}
         createdAt={post.created_at}
         postId={post.hash_id}
@@ -31,7 +32,7 @@ const jet = props => {
         updatedAt={post.updated_at}
         username={post.voter_id}
         score={post.cached_votes_score}
-        setUpdatePosts={setUpdatePosts}
+        setUpdatePost={setUpdatePost}
       />
     ));
   } else {
@@ -57,8 +58,8 @@ const jet = props => {
         updateCurrent(jetPosts.data);
         setData(jetPosts.data);
 
-        if (update) {
-          setUpdatePosts(false);
+        if (updatePost) {
+          setUpdatePost(false);
         }
       };
 
@@ -68,7 +69,7 @@ const jet = props => {
 
       fetchJet();
       setLoading(false);
-    }, [update, jetId]);
+    }, [updatePost, jetId]);
   };
 
   useDeepComparison(jetData);

@@ -7,11 +7,12 @@ import Post from '../components/UI/Post/Post';
 const all = props => {
   const { allData } = props;
   const [data, setData] = useState(allData);
-  const [update, setUpdatePost] = useState(false);
+  const [updatePost, setUpdatePost] = useState(false);
 
   const posts = data.map(post => (
     <Post
       key={post.hash_id}
+      post={{ ...post, __type: 'Post' }}
       comments={post.comments_count}
       createdAt={post.created_at}
       jetId={post.jet_id}
@@ -42,7 +43,7 @@ const all = props => {
 
         updateCurrent(allPosts.data);
 
-        if (update) {
+        if (updatePost) {
           setUpdatePost(false);
         }
       };
@@ -52,7 +53,7 @@ const all = props => {
       }
 
       fetchAll();
-    }, [update]);
+    }, [updatePost]);
   };
 
   useDeepComparison(allData);
