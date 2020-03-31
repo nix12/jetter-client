@@ -26,7 +26,7 @@
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
-    "next": "^9.1.5",
+    "next": "^9.3.2",
     "next-redux-wrapper": "^3.0.0-alpha.2",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
