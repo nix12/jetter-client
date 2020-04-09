@@ -76,7 +76,11 @@ export const logout = () => dispatch => {
 
         return response;
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        const error = 'Error: Failed to logout.';
+
+        dispatch(authFail(error));
+      });
   }
 
   dispatch(authLogout());
@@ -120,8 +124,15 @@ export const auth = (username, password) => (dispatch, getState) => {
       );
     })
     .catch(err => {
-      console.log('[Auth Failure]', err);
-      dispatch(authFail(err.response.data.errors));
+      if (err.response.status === 400 || err.response.status === 401) {
+        const error = 'Error: Wrong username or password.';
+
+        dispatch(authFail(error));
+      } else if (err.response.status >= 500) {
+        const error = 'Error: Internal Server Error.';
+
+        dispatch(authFail(error));
+      }
     });
 };
 

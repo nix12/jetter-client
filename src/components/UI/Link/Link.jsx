@@ -50,26 +50,26 @@ const useStyles = makeStyles({
   }
 });
 
-const Post = props => {
+const LinkUI = props => {
   const {
-    post,
+    link,
     username,
     createdAt,
     score,
     jetId,
-    postId,
+    linkId,
     title,
-    body,
+    uri,
     comments,
-    setUpdatePost
+    setUpdatelink
   } = props;
 
-  const upvote = (jet, post) =>
-    axios.put(`/api/jets/${jet}/posts/${post}/upvote`);
-  const downvote = (jet, post) =>
-    axios.put(`/api/jets/${jet}/posts/${post}/downvote`);
-  const unvote = (jet, post) =>
-    axios.put(`/api/jets/${jet}/posts/${post}/unvote`);
+  const upvote = (jet, link) =>
+    axios.put(`/api/jets/${jet}/links/${link}/upvote`);
+  const downvote = (jet, link) =>
+    axios.put(`/api/jets/${jet}/links/${link}/downvote`);
+  const unvote = (jet, link) =>
+    axios.put(`/api/jets/${jet}/links/${link}/unvote`);
 
   const classes = useStyles();
   const now = new Moment();
@@ -79,41 +79,41 @@ const Post = props => {
   const [up, setUpvote] = useState(false);
   const [down, setDownvote] = useState(false);
 
-  const upvoted = async (jet, post) => {
+  const upvoted = async (jet, link) => {
     if (up) {
-      await unvote(jet, post).then(() => setUpvote(false));
+      await unvote(jet, link).then(() => setUpvote(false));
     } else {
-      await upvote(jet, post).then(() => setUpvote(true));
+      await upvote(jet, link).then(() => setUpvote(true));
     }
 
-    setUpdatePost(true);
+    setUpdatelink(true);
   };
 
-  const downvoted = async (jet, post) => {
+  const downvoted = async (jet, link) => {
     if (down) {
-      await unvote(jet, post).then(() => setDownvote(false));
+      await unvote(jet, link).then(() => setDownvote(false));
     } else {
-      await downvote(jet, post).then(() => setDownvote(true));
+      await downvote(jet, link).then(() => setDownvote(true));
     }
 
-    setUpdatePost(true);
+    setUpdatelink(true);
   };
 
-  const switchVote = async (jet, post) => {
-    await unvote(jet, post).then(() => {
+  const switchVote = async (jet, link) => {
+    await unvote(jet, link).then(() => {
       setUpvote(false);
       setDownvote(false);
     });
 
     if (up) {
-      downvoted(jet, post);
+      downvoted(jet, link);
     }
 
     if (down) {
-      upvoted(jet, post);
+      upvoted(jet, link);
     }
 
-    setUpdatePost(true);
+    setUpdatelink(true);
   };
 
   return (
@@ -122,8 +122,8 @@ const Post = props => {
         <ArrowUp
           onClick={
             !down
-              ? () => upvoted(jetId, postId)
-              : () => switchVote(jetId, postId)
+              ? () => upvoted(jetId, linkId)
+              : () => switchVote(jetId, linkId)
           }
           className={up ? classes.voted : ''}
         />
@@ -131,8 +131,8 @@ const Post = props => {
         <ArrowDown
           onClick={
             !up
-              ? () => downvoted(jetId, postId)
-              : () => switchVote(jetId, postId)
+              ? () => downvoted(jetId, linkId)
+              : () => switchVote(jetId, linkId)
           }
           className={down ? classes.voted : ''}
         />
@@ -150,7 +150,7 @@ const Post = props => {
                 {jetId}
               </span>
             </Link>
-            &nbsp;&bull; Posted by&nbsp;
+            &nbsp;&bull; posted by&nbsp;
             <Link href="/user/[username]" as={`/user/${username}`}>
               <span className={classes.user}>
                 u/
@@ -161,40 +161,31 @@ const Post = props => {
             {duration}
             &nbsp;ago
           </Typography>
-          <Link
-            href="/j/[jetId]/post/[postId]"
-            as={`/j/${jetId}/post/${postId}`}
-          >
-            <a style={{ textDecoration: 'none' }}>
-              <Typography variant="h6" component="p">
-                {title}
-              </Typography>
-            </a>
-          </Link>
-          {body ? <Divider /> : null}
-          <Typography variant="h6" component="p">
-            {body}
-          </Typography>
+          <a href={`http://${uri}`} style={{ textDecoration: 'none' }}>
+            <Typography variant="h6" component="p">
+              {title}
+            </Typography>
+          </a>
         </CardContent>
         <CardActions>
           <Link
-            href="/j/[jetId]/post/[postId]"
-            as={`/j/${jetId}/post/${postId}`}
+            href="/j/[jetId]/link/[linkId]"
+            as={`/j/${jetId}/link/${linkId}`}
           >
             <Button size="small">
               <span>{comments}</span>
               &nbsp;comments
             </Button>
           </Link>
-          <Can do="update" on={post}>
+          <Can do="update" on={link}>
             <Link
-              href="/j/[jetId]/post/[postId]/edit"
-              as={`/j/${jetId}/post/${postId}/edit`}
+              href="/j/[jetId]/link/[linkId]/edit"
+              as={`/j/${jetId}/link/${linkId}/edit`}
             >
               <Button size="small">edit</Button>
             </Link>
           </Can>
-          <Can do="delete" on={post}>
+          <Can do="delete" on={link}>
             <Button size="small">delete</Button>
           </Can>
         </CardActions>
@@ -203,4 +194,4 @@ const Post = props => {
   );
 };
 
-export default Post;
+export default LinkUI;

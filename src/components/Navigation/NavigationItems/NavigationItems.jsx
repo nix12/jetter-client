@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import Cookies from 'universal-cookie';
 import jwtDecode from 'jwt-decode';
 
@@ -7,10 +8,7 @@ import NavigationItem from './NavigationItem/NavigationItem';
 
 const navigationItems = props => {
   const { name, onClose } = props;
-  const cookies = new Cookies();
-  const token = cookies.get('token');
-  const data = token ? jwtDecode(token) : '';
-  const { username } = data;
+  const username = useSelector(state => state.auth.currentUser.username);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   return (
@@ -26,8 +24,8 @@ const navigationItems = props => {
 
       <NavigationItem
         click={onClose}
-        link="/user/update"
-        linkAs={`/u/${name}/password`}
+        link="/user/[username]/password"
+        linkAs={`/user/${username}/password`}
       >
         Change Password
       </NavigationItem>

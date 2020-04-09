@@ -1,29 +1,50 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import _ from 'lodash';
 import axios from '../services/axios/axios-forum';
 
 import Post from '../components/UI/Post/Post';
+import LinkUI from '../components/UI/Link/Link';
 
 const all = props => {
   const { allData } = props;
+
   const [data, setData] = useState(allData);
   const [updatePost, setUpdatePost] = useState(false);
 
-  const posts = data.map(post => (
-    <Post
-      key={post.hash_id}
-      post={{ ...post, __type: 'Post' }}
-      comments={post.comments_count}
-      createdAt={post.created_at}
-      jetId={post.jet_id}
-      postId={post.hash_id}
-      title={post.title}
-      updatedAt={post.updated_at}
-      username={post.voter_id}
-      score={post.cached_votes_score}
-      setUpdatePost={setUpdatePost}
-    />
-  ));
+  const posts = data.map(post =>
+    post.uri ? (
+      <LinkUI
+        key={post.hash_id}
+        link={{ __type: 'Link', ...post }}
+        comments={post.comments_count}
+        createdAt={post.created_at}
+        jetId={post.jet_id}
+        linkId={post.hash_id}
+        title={post.title}
+        uri={post.uri}
+        updatedAt={post.updated_at}
+        username={post.voter_id}
+        score={post.cached_votes_score}
+        setUpdatePost={setUpdatePost}
+      />
+    ) : (
+      <Post
+        key={post.hash_id}
+        post={{ ...post, __type: 'Post' }}
+        comments={post.comments_count}
+        createdAt={post.created_at}
+        jetId={post.jet_id}
+        postId={post.hash_id}
+        title={post.title}
+        uri={post.uri}
+        updatedAt={post.updated_at}
+        username={post.voter_id}
+        score={post.cached_votes_score}
+        setUpdatePost={setUpdatePost}
+      />
+    )
+  );
 
   const usePrevious = value => {
     const ref = useRef();

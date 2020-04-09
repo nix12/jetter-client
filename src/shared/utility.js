@@ -22,3 +22,13 @@ export const checkValidity = (value, rules) => {
 
   return isValid;
 };
+
+export const checkPasswordMatch = (password, passwordConfirmation) => {
+  let match = false;
+
+  if (password && passwordConfirmation) {
+    match = password === passwordConfirmation;
+  }
+
+  return match;
+};

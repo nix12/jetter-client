@@ -7,7 +7,7 @@ import Button from '../UI/Button/Button';
 import { updateObject, checkValidity } from '../../shared/utility';
 import { createComment, updateComment } from '../../store/actions/index';
 
-const commentForm = props => {
+const CommentForm = props => {
   const {
     commentId,
     setUpdateComment,
@@ -166,4 +166,4 @@ const commentForm = props => {
   ) : null;
 };
 
-export default commentForm;
+export default CommentForm;

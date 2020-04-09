@@ -1,39 +1,45 @@
 import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/router';
 
-import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
-import Input from '../../components/UI/Input/Input';
-import Button from '../../components/UI/Button/Button';
-import { ability } from '../../services/casl/ability';
+import Button from '../UI/Button/Button';
+import Input from '../UI/Input/Input';
+
 import { updateObject, checkValidity } from '../../shared/utility';
-import { auth } from '../../store/actions/index';
+import { createPost } from '../../store/actions/index';
 
-const Login = () => {
+const PostForm = props => {
+  const { value, index } = props;
+  const { error } = props;
+
   const [form, setForm] = useState({
     controls: {
-      username: {
+      title: {
         elementType: 'input',
         elementConfig: {
           type: 'text',
-          placeholder: 'Username'
-        },
-        value: '',
-        validation: {
-          required: true
-        },
-        valid: false,
-        touched: false
-      },
-      password: {
-        elementType: 'input',
-        elementConfig: {
-          type: 'password',
-          placeholder: 'Password'
+          placeholder: 'Title'
         },
         value: '',
         validation: {
           required: true,
-          minLength: 6
+          minLength: 3
+        },
+        valid: false,
+        touched: false
+      },
+      body: {
+        elementType: 'textarea',
+        elementConfig: {
+          type: 'text',
+          placeholder: 'Body',
+          rowsMin: '20',
+          cols: '80'
+        },
+        value: '',
+        validation: {
+          required: true,
+          minLength: 3
         },
         valid: false,
         touched: false
@@ -41,13 +47,8 @@ const Login = () => {
     }
   });
 
+  const router = useRouter();
   const dispatch = useDispatch();
-
-  const username = useSelector(state => state.auth.currentUser.username);
-  const userId = useSelector(state => state.auth.currentUser.userId);
-  const roles = useSelector(state => state.auth.currentUser.roles);
-  const error = useSelector(state => state.auth.currentUser.error);
-  const loading = useSelector(state => state.auth.currentUser.loading);
 
   const inputChangedHandler = (event, controlName) => {
     const updatedControls = updateObject(form.controls, {
@@ -67,7 +68,15 @@ const Login = () => {
   const submitHandler = event => {
     event.preventDefault();
 
-    dispatch(auth(form.controls.username.value, form.controls.password.value));
+    const { jetId } = router.query;
+
+    dispatch(
+      createPost(form.controls.title.value, form.controls.body.value, jetId)
+    ).then(response => {
+      if (response.status === 201) {
+        router.push('/j/[jetId]', `/j/${jetId}`);
+      }
+    });
   };
 
   const formElementsArray = [];
@@ -78,7 +87,7 @@ const Login = () => {
     });
   });
 
-  let formOutput = formElementsArray.map(formElement => (
+  const formOutput = formElementsArray.map(formElement => (
     <Input
       key={formElement.id}
       elementType={formElement.config.elementType}
@@ -88,36 +97,29 @@ const Login = () => {
       shouldValidate={formElement.config.validation}
       touched={formElement.config.touched}
       changed={event => inputChangedHandler(event, formElement.id)}
+      name={formElement.id}
     />
   ));
-
-  if (loading) {
-    formOutput = <CircularProgress />;
-  }
 
   let errorMessage = null;
 
   if (error) {
-    errorMessage = <p>{error}</p>;
+    Object.entries(error).map(([key, value]) => {
+      const field = key.charAt(0).toUpperCase() + key.slice(1);
+
+      errorMessage = (
+        <div>
+          <span>{field}</span>
+          <span>{value}</span>
+        </div>
+      );
+
+      return errorMessage;
+    });
   }
 
-  const rolesList = roles
-    ? roles.map((role, index) => (
-        <span key={index} style={{ display: 'block' }}>
-          role {role}
-        </span>
-      ))
-    : null;
-
-  const abilities = ability.rules.map((rule, index) => (
-    <span key={index} style={{ display: 'block' }}>
-      rules [{rule.actions}: {rule.subject}]
-    </span>
-  ));
-
   return (
-    <div>
-      <h1>Auth</h1>
+    value === index && (
       <div>
         {errorMessage}
         <form onSubmit={submitHandler}>
@@ -125,14 +127,8 @@ const Login = () => {
           <Button type="submit">Submit</Button>
         </form>
       </div>
-      <div>
-        <span style={{ display: 'block' }}>ID: {userId}</span>
-        <span style={{ display: 'block' }}>Username: {username}</span>
-        <span style={{ display: 'block' }}>{rolesList}</span>
-        {abilities}
-      </div>
-    </div>
+    )
   );
 };
 
-export default Login;
+export default PostForm;

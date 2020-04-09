@@ -15,6 +15,7 @@ import DefaultTheme from '../themes/theme';
 import authReducer from '../store/reducers/auth';
 import registerReducer from '../store/reducers/register';
 import userReducer from '../store/reducers/user';
+import jetReducer from '../store/reducers/jet';
 
 import redirectTo from '../shared/redirectTo';
 
@@ -23,7 +24,8 @@ import Layout from '../containers/Layout/Layout';
 const rootReducer = combineReducers({
   auth: authReducer,
   register: registerReducer,
-  user: userReducer
+  user: userReducer,
+  jet: jetReducer
 });
 
 const makeStore = (initialState, options) =>

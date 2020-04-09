@@ -12,3 +12,7 @@ export const UPDATE_SUCCESS = 'UPDATE_SUCCESS';
 export const UPDATE_FAIL = 'UPDATE_FAIL';
 
 export const USER_DESTROY = 'USER_DESTROY';
+
+export const JET_START = 'JET_START';
+export const JET_SUCCESS = 'JET_SUCCESS';
+export const JET_FAIL = 'JET_FAIL';

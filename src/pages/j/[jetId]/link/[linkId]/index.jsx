@@ -3,21 +3,21 @@ import { useRouter } from 'next/router';
 import _ from 'lodash';
 
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
-import Post from '../../../../components/UI/Post/Post';
-import Comment from '../../../../components/UI/Comment/Comment';
-import CommentForm from '../../../../components/Forms/Comment';
+import LinkUI from '../../../../../components/UI/Link/Link';
+import Comment from '../../../../../components/UI/Comment/Comment';
+import CommentForm from '../../../../../components/Forms/Comment';
 
-import axios from '../../../../services/axios/axios-forum';
+import axios from '../../../../../services/axios/axios-forum';
 
 const Show = props => {
-  const { postData } = props;
+  const { linkData } = props;
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(postData);
-  const [updatePost, setUpdatePost] = useState(false);
+  const [data, setData] = useState(linkData);
+  const [updateLink, setUpdateLink] = useState(false);
   const [updateComment, setUpdateComment] = useState(false);
   const [toggleReply, setToggleReply] = useState(true);
   const router = useRouter();
-  const { jetId, postId } = router.query;
+  const { jetId, linkId } = router.query;
   let comments;
 
   const renderComment = comment => {
@@ -60,11 +60,11 @@ const Show = props => {
   //   const [current, updateCurrent] = useState([]);
 
   useEffect(() => {
-    const fetchPost = async () => {
-      const postData = await axios.get(`/api/jets/${jetId}/posts/${postId}`);
+    const fetchLink = async () => {
+      const linkData = await axios.get(`/api/jets/${jetId}/links/${linkId}`);
 
       // updateCurrent(postData.data);
-      setData(postData.data);
+      setData(linkData.data);
       if (updateComment) {
         setUpdateComment(false);
       }
@@ -74,27 +74,27 @@ const Show = props => {
     //   setData(current);
     // }
 
-    fetchPost();
+    fetchLink();
     setLoading(false);
-  }, [updateComment, updatePost, postId]);
+  }, [updateComment, updateLink, linkId]);
   // };
 
   // useDeepComparison(postData);
-
   return (
     <div>
-      <Post
-        post={{ __type: 'Post', ...data.post }}
-        body={data.post.body}
-        comments={data.post.comments_count}
-        createdAt={data.post.created_at}
-        jetId={data.post.jet_id}
-        postId={data.post.hash_id}
-        title={data.post.title}
-        updatedAt={data.post.updated_at}
-        username={data.post.voter_id}
-        score={data.post.cached_votes_score}
-        setUpdatePost={setUpdatePost}
+      <LinkUI
+        link={{ __type: 'Link', ...data.link }}
+        body={data.link.body}
+        comments={data.link.comments_count}
+        createdAt={data.link.created_at}
+        jetId={data.link.jet_id}
+        linkId={data.link.hash_id}
+        title={data.link.title}
+        uri={data.link.uri}
+        updatedAt={data.link.updated_at}
+        username={data.link.voter_id}
+        score={data.link.cached_votes_score}
+        setUpdatePost={setUpdateLink}
       />
       <CommentForm
         rows="15"
@@ -109,11 +109,12 @@ const Show = props => {
 };
 
 Show.getInitialProps = async ({ query }) => {
-  const { jetId, postId } = query;
-  const url = `/api/jets/${jetId}/posts/${postId}`;
-  const post = await axios.get(url);
+  const { jetId, linkId } = query;
+  const url = `/api/jets/${jetId}/links/${linkId}`;
 
-  return { postData: post.data };
+  const link = await axios.get(url);
+
+  return { linkData: link.data };
 };
 
 export default Show;

@@ -22,9 +22,9 @@ export const updateFail = error => {
 
 export const update = (
   username,
-  current_password,
+  currentPassword,
   password,
-  password_confirmation
+  passwordConfirmation
 ) => dispatch => {
   dispatch(updateStart());
 
@@ -32,13 +32,13 @@ export const update = (
   const userData = {
     user: {
       username,
-      current_password,
+      current_password: currentPassword,
       password,
-      password_confirmation
+      password_confirmation: passwordConfirmation
     }
   };
 
-  axios
+  return axios
     .put(url, userData)
     .then(() => {
       dispatch(updateSuccess());

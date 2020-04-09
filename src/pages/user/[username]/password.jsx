@@ -4,20 +4,25 @@ import Cookies from 'universal-cookie';
 import jwtDecode from 'jwt-decode';
 
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
-import Input from '../../components/UI/Input/Input';
-import Button from '../../components/UI/Button/Button';
-import Can from '../../components/Permissions/Can';
-import { checkValidity, updateObject } from '../../shared/utility';
-import { update } from '../../store/actions/index';
+import Input from '../../../components/UI/Input/Input';
+import Button from '../../../components/UI/Button/Button';
+import Can from '../../../components/Permissions/Can';
+import {
+  checkValidity,
+  updateObject,
+  checkPasswordMatch
+} from '../../../shared/utility';
+import { update } from '../../../store/actions/index';
+import redirectTo from '../../../shared/redirectTo';
 
-const updateUser = () => {
+const UpdateUser = () => {
   const dispatch = useDispatch();
   const loading = useSelector(state => state.user.loading);
   const error = useSelector(state => state.user.error);
 
   const [form, setForm] = useState({
     controls: {
-      current_password: {
+      currentPassword: {
         elementType: 'input',
         elementConfig: {
           type: 'password',
@@ -25,7 +30,9 @@ const updateUser = () => {
         },
         value: '',
         validation: {
-          required: true
+          required: true,
+          minLength: 8,
+          maxLength: 100
         },
         valid: false,
         touched: false
@@ -38,12 +45,14 @@ const updateUser = () => {
         },
         value: '',
         validation: {
-          required: true
+          required: true,
+          minLength: 8,
+          maxLength: 100
         },
         valid: false,
         touched: false
       },
-      password_confirmation: {
+      passwordConfirmation: {
         elementType: 'input',
         elementConfig: {
           type: 'password',
@@ -52,10 +61,12 @@ const updateUser = () => {
         value: '',
         validation: {
           required: true,
-          minLength: 6
+          minLength: 8,
+          maxLength: 100
         },
         valid: false,
-        touched: false
+        touched: false,
+        match: false
       }
     }
   });
@@ -68,7 +79,11 @@ const updateUser = () => {
           event.target.value,
           form.controls[controlName].validation
         ),
-        touched: true
+        touched: true,
+        match: checkPasswordMatch(
+          form.controls.password.value,
+          event.target.value
+        )
       })
     });
 
@@ -84,26 +99,26 @@ const updateUser = () => {
 
     dispatch(
       update(
-        data.username,
-        form.controls.current_password.value,
+        data.user.username,
+        form.controls.currentPassword.value,
         form.controls.password.value,
-        form.controls.password_confirmation.value
+        form.controls.passwordConfirmation.value
       )
     ).then(() => {
       setForm(prevState => ({
         ...prevState,
         controls: {
           ...prevState.controls,
-          current_password: {
-            ...prevState.current_password,
+          currentPassword: {
+            ...prevState.currentPassword,
             value: ''
           },
           password: {
             ...prevState.password,
             value: ''
           },
-          password_confirmation: {
-            ...prevState.password_confirmation,
+          passwordConfirmation: {
+            ...prevState.passwordConfirmation,
             value: ''
           }
         }
@@ -115,7 +130,7 @@ const updateUser = () => {
   Object.keys(form.controls).map(key => {
     return formElementsArray.push({
       id: key,
-      config: this.state.controls[key]
+      config: form.controls[key]
     });
   });
 
@@ -139,23 +154,32 @@ const updateUser = () => {
   let errorMessage = null;
 
   if (error) {
-    errorMessage = <p>{error}</p>;
+    errorMessage = <p style={{ color: 'red' }}>{error}</p>;
   }
 
   return (
     <div>
       <h1>Update Password</h1>
-
-      {errorMessage}
-
-      <Can I="manage" this="User">
+      <Can I="update" this="User">
+        {errorMessage}
         <form onSubmit={submitHandler}>
           {outputForm}
-          <Button>Submit</Button>
+          <Button type="submit">Submit</Button>
         </form>
       </Can>
     </div>
   );
 };
 
-export default updateUser;
+UpdateUser.getInitialProps = async ({ res }) => {
+  const cookies = new Cookies();
+  const token = cookies.get('token');
+
+  if (!token) {
+    redirectTo('/login', { res, status: 301 });
+  }
+
+  return {};
+};
+
+export default UpdateUser;

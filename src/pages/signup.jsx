@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 
-import Input from '../../components/UI/Input/Input';
-import Button from '../../components/UI/Button/Button';
-import { updateObject, checkValidity } from '../../shared/utility';
-import { register } from '../../store/actions/index';
+import Input from '../components/UI/Input/Input';
+import Button from '../components/UI/Button/Button';
+import {
+  updateObject,
+  checkValidity,
+  checkPasswordMatch
+} from '../shared/utility';
+import { register } from '../store/actions/index';
 
-const New = () => {
+const Signup = () => {
   const error = useSelector(state => state.register.error);
   const dispatch = useDispatch();
   const router = useRouter();
@@ -22,7 +26,9 @@ const New = () => {
         },
         value: '',
         validation: {
-          required: true
+          required: true,
+          minLength: 3,
+          maxLength: 15
         },
         valid: false,
         touched: false
@@ -36,7 +42,8 @@ const New = () => {
         value: '',
         validation: {
           required: true,
-          minLength: 6
+          minLength: 8,
+          maxLength: 100
         },
         valid: false,
         touched: false
@@ -50,10 +57,12 @@ const New = () => {
         value: '',
         validation: {
           required: true,
-          minLength: 6
+          minLength: 8,
+          maxLength: 100
         },
         valid: false,
-        touched: false
+        touched: false,
+        match: false
       }
     }
   });
@@ -66,7 +75,11 @@ const New = () => {
           event.target.value,
           form.controls[controlName].validation
         ),
-        touched: true
+        touched: true,
+        match: checkPasswordMatch(
+          form.controls.password.value,
+          event.target.value
+        )
       })
     });
 
@@ -83,8 +96,8 @@ const New = () => {
         form.controls.password_confirmation.value
       )
     )
-      .then(() => {
-        if (!error) {
+      .then(response => {
+        if (!response) {
           router.push('/');
         }
       })
@@ -117,16 +130,14 @@ const New = () => {
   ));
 
   let errorMessage = null;
-
   if (error) {
-    Object.entries(error).map(([key, value], i) => {
+    errorMessage = Object.entries(error).map(([key, value], i) => {
       const field = key.charAt(0).toUpperCase() + key.slice(1);
 
-      errorMessage = (
-        <p>
+      return (
+        <p key={key} style={{ color: 'red' }}>
           <span>
-            {field}
-            {value}
+            {field}: {value}
           </span>
         </p>
       );
@@ -136,7 +147,6 @@ const New = () => {
   return (
     <div>
       <h1>Sign Up</h1>
-
       <div>
         {errorMessage}
         <form onSubmit={submitHandler}>
@@ -148,4 +158,4 @@ const New = () => {
   );
 };
 
-export default New;
+export default Signup;

@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
-import Button from '../../components/UI/Button/Button';
-import Input from '../../components/UI/Input/Input';
-import { updateObject, checkValidity } from '../../shared/utility';
-import { createJet } from '../../store/actions/index';
+import Button from '../../../../../components/UI/Button/Button';
+import Input from '../../../../../components/UI/Input/Input';
 
-const NewJet = () => {
-  const error = useSelector(state => state.jet.error);
+import { updateObject, checkValidity } from '../../../../../shared/utility';
+import { updatePost } from '../../../../../store/actions/index';
+
+import axios from '../../../../../services/axios/axios-forum';
+
+const editLink = props => {
+  const { error } = props;
 
   const [form, setForm] = useState({
     controls: {
-      name: {
+      title: {
         elementType: 'input',
         elementConfig: {
           type: 'text',
-          placeholder: 'Name'
+          placeholder: 'Title'
         },
         value: '',
         validation: {
@@ -26,13 +29,13 @@ const NewJet = () => {
         valid: false,
         touched: false
       },
-      description: {
-        elementType: 'textarea',
+      uri: {
+        elementType: 'input',
         elementConfig: {
           type: 'text',
-          placeholder: 'Description',
+          placeholder: 'Body',
           rowsMin: '20',
-          cols: '50'
+          cols: '80'
         },
         value: '',
         validation: {
@@ -47,6 +50,30 @@ const NewJet = () => {
 
   const router = useRouter();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      const { jetId, linkId } = router.query;
+      const postData = await axios.get(`/api/jets/${jetId}/links/${linkId}`);
+
+      setForm(prevState => ({
+        ...prevState,
+        controls: {
+          ...prevState.controls,
+          title: {
+            ...prevState.title,
+            value: postData.data.link.title
+          },
+          uri: {
+            ...prevState.body,
+            value: postData.data.link.uri
+          }
+        }
+      }));
+    };
+
+    fetchPost();
+  }, []);
 
   const inputChangedHandler = (event, controlName) => {
     const updatedControls = updateObject(form.controls, {
@@ -66,17 +93,20 @@ const NewJet = () => {
   const submitHandler = event => {
     event.preventDefault();
 
+    const { jetId, linkId } = router.query;
+
     dispatch(
-      createJet(form.controls.name.value, form.controls.description.value)
-    )
-      .then(response => {
-        if (response.status === 201) {
-          router.push('/j/[jetId]', `/j/${form.controls.name.value}`);
-        }
-      })
-      .catch(err => {
-        router.replace('/j/new');
-      });
+      updatePost(
+        form.controls.title.value,
+        form.controls.body.value,
+        jetId,
+        linkId
+      )
+    ).then(response => {
+      if (response.status === 204) {
+        router.push('/j/[jetId]/link/[linkId]', `/j/${jetId}/link/${linkId}`);
+      }
+    });
   };
 
   const formElementsArray = [];
@@ -104,22 +134,24 @@ const NewJet = () => {
   let errorMessage = null;
 
   if (error) {
-    errorMessage = Object.entries(error).map(([key, value]) => {
+    Object.entries(error).map(([key, value]) => {
       const field = key.charAt(0).toUpperCase() + key.slice(1);
 
-      return (
-        <div key={field} style={{ color: 'red' }}>
-          <span>
-            {field}: {value}
-          </span>
+      errorMessage = (
+        <div>
+          <span>{field}</span>
+          <span>{value}</span>
         </div>
       );
+
+      return errorMessage;
     });
   }
 
   return (
     <div>
-      <h1>New Jet</h1>
+      <h1>Edit Link</h1>
+
       <div>
         {errorMessage}
         <form onSubmit={submitHandler}>
@@ -131,4 +163,4 @@ const NewJet = () => {
   );
 };
 
-export default NewJet;
+export default editLink;

@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
-import Button from '../../components/UI/Button/Button';
-import Input from '../../components/UI/Input/Input';
-import { updateObject, checkValidity } from '../../shared/utility';
-import { createJet } from '../../store/actions/index';
+import Button from '../UI/Button/Button';
+import Input from '../UI/Input/Input';
 
-const NewJet = () => {
-  const error = useSelector(state => state.jet.error);
+import { updateObject, checkValidity } from '../../shared/utility';
+import { createLink } from '../../store/actions/index';
+
+const LinkForm = props => {
+  const { value, index } = props;
+  const { error } = props;
 
   const [form, setForm] = useState({
     controls: {
-      name: {
+      title: {
         elementType: 'input',
         elementConfig: {
           type: 'text',
-          placeholder: 'Name'
+          placeholder: 'Title'
         },
         value: '',
         validation: {
@@ -26,13 +28,11 @@ const NewJet = () => {
         valid: false,
         touched: false
       },
-      description: {
-        elementType: 'textarea',
+      uri: {
+        elementType: 'input',
         elementConfig: {
           type: 'text',
-          placeholder: 'Description',
-          rowsMin: '20',
-          cols: '50'
+          placeholder: 'URL'
         },
         value: '',
         validation: {
@@ -66,17 +66,15 @@ const NewJet = () => {
   const submitHandler = event => {
     event.preventDefault();
 
+    const { jetId } = router.query;
+
     dispatch(
-      createJet(form.controls.name.value, form.controls.description.value)
-    )
-      .then(response => {
-        if (response.status === 201) {
-          router.push('/j/[jetId]', `/j/${form.controls.name.value}`);
-        }
-      })
-      .catch(err => {
-        router.replace('/j/new');
-      });
+      createLink(form.controls.title.value, form.controls.uri.value, jetId)
+    ).then(response => {
+      if (response.status === 201) {
+        router.push('/j/[jetId]', `/j/${jetId}`);
+      }
+    });
   };
 
   const formElementsArray = [];
@@ -104,22 +102,22 @@ const NewJet = () => {
   let errorMessage = null;
 
   if (error) {
-    errorMessage = Object.entries(error).map(([key, value]) => {
+    Object.entries(error).map(([key, value]) => {
       const field = key.charAt(0).toUpperCase() + key.slice(1);
 
-      return (
-        <div key={field} style={{ color: 'red' }}>
-          <span>
-            {field}: {value}
-          </span>
+      errorMessage = (
+        <div>
+          <span>{field}</span>
+          <span>{value}</span>
         </div>
       );
+
+      return errorMessage;
     });
   }
 
   return (
-    <div>
-      <h1>New Jet</h1>
+    value === index && (
       <div>
         {errorMessage}
         <form onSubmit={submitHandler}>
@@ -127,8 +125,8 @@ const NewJet = () => {
           <Button type="submit">Submit</Button>
         </form>
       </div>
-    </div>
+    )
   );
 };
 
-export default NewJet;
+export default LinkForm;

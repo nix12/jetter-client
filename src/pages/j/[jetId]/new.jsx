@@ -2,134 +2,47 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
-import Button from '../../../components/UI/Button/Button';
-import Input from '../../../components/UI/Input/Input';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 
-import { updateObject, checkValidity } from '../../../shared/utility';
-import { createPost } from '../../../store/actions/index';
+import PostForm from '../../../components/Forms/Post';
+import LinkForm from '../../../components/Forms/Link';
 
-const newPost = props => {
-  const { error } = props;
-
-  const [form, setForm] = useState({
-    controls: {
-      title: {
-        elementType: 'input',
-        elementConfig: {
-          type: 'text',
-          placeholder: 'Title'
-        },
-        value: '',
-        validation: {
-          required: true,
-          minLength: 3
-        },
-        valid: false,
-        touched: false
-      },
-      body: {
-        elementType: 'textarea',
-        elementConfig: {
-          type: 'text',
-          placeholder: 'Body',
-          rowsMin: '20',
-          cols: '80'
-        },
-        value: '',
-        validation: {
-          required: true,
-          minLength: 3
-        },
-        valid: false,
-        touched: false
-      }
-    }
-  });
-
-  const router = useRouter();
-  const dispatch = useDispatch();
-
-  const inputChangedHandler = (event, controlName) => {
-    const updatedControls = updateObject(form.controls, {
-      [controlName]: updateObject(form.controls[controlName], {
-        value: event.target.value,
-        valid: checkValidity(
-          event.target.value,
-          form.controls[controlName].validation
-        ),
-        touched: true
-      })
-    });
-
-    setForm({ controls: updatedControls });
+const allyProps = index => {
+  return {
+    id: `nav-tab-${index}`,
+    'aria-controls': `nav-panel-${index}`
   };
+};
 
-  const submitHandler = event => {
-    event.preventDefault();
+const NewPost = props => {
+  const [value, setValue] = useState(0);
 
-    const { jetId } = router.query;
-
-    dispatch(
-      createPost(form.controls.title.value, form.controls.body.value, jetId)
-    ).then(response => {
-      if (response.status === 201) {
-        router.push('/j/[jetId]', `/j/${jetId}`);
-      }
-    });
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
   };
-
-  const formElementsArray = [];
-  Object.keys(form.controls).map(key => {
-    return formElementsArray.push({
-      id: key,
-      config: form.controls[key]
-    });
-  });
-
-  const formOutput = formElementsArray.map(formElement => (
-    <Input
-      key={formElement.id}
-      elementType={formElement.config.elementType}
-      elementConfig={formElement.config.elementConfig}
-      value={formElement.config.value}
-      invalid={!formElement.config.valid}
-      shouldValidate={formElement.config.validation}
-      touched={formElement.config.touched}
-      changed={event => inputChangedHandler(event, formElement.id)}
-      name={formElement.id}
-    />
-  ));
-
-  let errorMessage = null;
-
-  if (error) {
-    Object.entries(error).map(([key, value]) => {
-      const field = key.charAt(0).toUpperCase() + key.slice(1);
-
-      errorMessage = (
-        <div>
-          <span>{field}</span>
-          <span>{value}</span>
-        </div>
-      );
-
-      return errorMessage;
-    });
-  }
-
   return (
     <div>
-      <h1>New Post</h1>
-
-      <div>
-        {errorMessage}
-        <form onSubmit={submitHandler}>
-          {formOutput}
-          <Button type="submit">Submit</Button>
-        </form>
-      </div>
+      <Tabs variant="fullWidth" value={value} onChange={handleChange}>
+        <Tab
+          label="Text Post"
+          component="a"
+          onClick={event => event.preventDefault()}
+          {...props}
+          {...allyProps(0)}
+        />
+        <Tab
+          label="Link Post"
+          component="a"
+          onClick={event => event.preventDefault()}
+          {...props}
+          {...allyProps(1)}
+        />
+      </Tabs>
+      <PostForm value={value} index={0} />
+      <LinkForm value={value} index={1} />
     </div>
   );
 };
 
-export default newPost;
+export default NewPost;

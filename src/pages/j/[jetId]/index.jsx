@@ -4,10 +4,11 @@ import _ from 'lodash';
 
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import Post from '../../../components/UI/Post/Post';
+import LinkUI from '../../../components/UI/Link/Link';
 
 import axios from '../../../services/axios/axios-forum';
 
-const jet = props => {
+const Jet = props => {
   const { jetData } = props;
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(jetData);
@@ -19,22 +20,41 @@ const jet = props => {
   if (loading) {
     posts = <CircularProgress />;
   } else if (!_.isEmpty(data)) {
-    posts = data.map(post => (
-      <Post
-        key={post.hash_id}
-        post={{ __type: 'Post', ...post }}
-        comments={post.comments_count}
-        createdAt={post.created_at}
-        postId={post.hash_id}
-        jetId={post.jet_id}
-        title={post.title}
-        body={post.body}
-        updatedAt={post.updated_at}
-        username={post.voter_id}
-        score={post.cached_votes_score}
-        setUpdatePost={setUpdatePost}
-      />
-    ));
+    posts = data.map(post =>
+      post.uri ? (
+        <LinkUI
+          key={post.hash_id}
+          link={{ __type: 'Link', ...post }}
+          comments={post.comments_count}
+          createdAt={post.created_at}
+          linkId={post.hash_id}
+          jetId={post.jet_id}
+          title={post.title}
+          body={post.body}
+          uri={post.uri}
+          updatedAt={post.updated_at}
+          username={post.voter_id}
+          score={post.cached_votes_score}
+          setUpdatePost={setUpdatePost}
+        />
+      ) : (
+        <Post
+          key={post.hash_id}
+          post={{ __type: 'Post', ...post }}
+          comments={post.comments_count}
+          createdAt={post.created_at}
+          postId={post.hash_id}
+          jetId={post.jet_id}
+          title={post.title}
+          body={post.body}
+          uri={post.uri}
+          updatedAt={post.updated_at}
+          username={post.voter_id}
+          score={post.cached_votes_score}
+          setUpdatePost={setUpdatePost}
+        />
+      )
+    );
   } else {
     posts = <p>No posts found.</p>;
   }
@@ -77,7 +97,7 @@ const jet = props => {
   return posts;
 };
 
-jet.getInitialProps = async ({ query }) => {
+Jet.getInitialProps = async ({ query }) => {
   const { jetId } = query;
   const url = `/api/jets/${jetId}`;
   const jetPosts = await axios.get(url);
@@ -85,4 +105,4 @@ jet.getInitialProps = async ({ query }) => {
   return { jetData: jetPosts.data };
 };
 
-export default jet;
+export default Jet;

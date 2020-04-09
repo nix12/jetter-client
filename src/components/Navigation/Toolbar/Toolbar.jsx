@@ -203,7 +203,6 @@ const toolbar = props => {
                 </Typography>
               </Button>
             </Link>
-
             <div className={classes.search}>
               <div className={classes.searchIcon}>
                 <SearchIcon />

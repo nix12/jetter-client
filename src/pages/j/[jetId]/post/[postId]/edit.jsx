@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
-import Button from '../../../../components/UI/Button/Button';
-import Input from '../../../../components/UI/Input/Input';
+import Button from '../../../../../components/UI/Button/Button';
+import Input from '../../../../../components/UI/Input/Input';
 
-import { updateObject, checkValidity } from '../../../../shared/utility';
-import { updatePost } from '../../../../store/actions/index';
+import { updateObject, checkValidity } from '../../../../../shared/utility';
+import { updatePost } from '../../../../../store/actions/index';
 
-import axios from '../../../../services/axios/axios-forum';
+import axios from '../../../../../services/axios/axios-forum';
 
 const editPost = props => {
   const { error } = props;
@@ -104,7 +104,7 @@ const editPost = props => {
       )
     ).then(response => {
       if (response.status === 204) {
-        router.push('/j/[jetId]/[postId]', `/j/${jetId}/${postId}`);
+        router.push('/j/[jetId]/post/[postId]', `/j/${jetId}/post/${postId}`);
       }
     });
   };

@@ -49,5 +49,6 @@ export const register = (username, password) => dispatch => {
       });
 
       dispatch(registerFail(errorData[0]));
+      return err.response.status;
     });
 };

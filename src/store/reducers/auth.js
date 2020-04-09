@@ -29,19 +29,17 @@ export const authSuccess = (state, action) => {
       userId: action.userId,
       username: action.username,
       roles: action.roles,
-      rules: action.rules,
-      error: null,
-      loading: false
-    }
+      rules: action.rules
+    },
+    error: null,
+    loading: false
   });
 };
 
 export const authFail = (state, action) => {
   return updateObject(state, {
-    currentUser: {
-      error: action.error,
-      loading: false
-    }
+    error: action.error,
+    loading: false
   });
 };
 

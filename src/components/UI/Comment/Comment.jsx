@@ -51,7 +51,7 @@ const useStyles = makeStyles({
   }
 });
 
-const comment = props => {
+const Comment = props => {
   const {
     comment,
     username,
@@ -214,4 +214,4 @@ const comment = props => {
   );
 };
 
-export default comment;
+export default Comment;

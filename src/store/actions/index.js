@@ -8,4 +8,6 @@ export { createJet } from './jet';
 
 export { createPost, updatePost } from './post';
 
+export { createLink, updateLink } from './link';
+
 export { createComment, updateComment } from './comment';
