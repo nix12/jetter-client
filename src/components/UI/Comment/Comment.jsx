@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Moment from 'moment';
 import Cookies from 'universal-cookie';
 import jwtDecode from 'jwt-decode';
@@ -18,6 +19,7 @@ import CommentForm from '../../Forms/Comment';
 import Button from '../Button/Button';
 import axios from '../../../services/axios/axios-forum';
 import Can from '../../Permissions/Can';
+import { deleteComment } from '../../../store/actions';
 
 const useStyles = makeStyles({
   card: {
@@ -58,19 +60,20 @@ const Comment = props => {
     createdAt,
     score,
     jetId,
-    postId,
+    textId,
+    linkId,
     commentId,
     body,
     setUpdateComment,
     nestedComments
   } = props;
 
-  const upvote = (jet, post, comment) =>
-    axios.put(`/api/jets/${jet}/posts/${post}/comments/${comment}/upvote`);
-  const downvote = (jet, post, comment) =>
-    axios.put(`/api/jets/${jet}/posts/${post}/comments/${comment}/downvote`);
-  const unvote = (jet, post, comment) =>
-    axios.put(`/api/jets/${jet}/posts/${post}/comments/${comment}/unvote`);
+  const upvote = (jet, text, comment) =>
+    axios.put(`/api/jets/${jet}/texts/${text}/comments/${comment}/upvote`);
+  const downvote = (jet, text, comment) =>
+    axios.put(`/api/jets/${jet}/texts/${text}/comments/${comment}/downvote`);
+  const unvote = (jet, text, comment) =>
+    axios.put(`/api/jets/${jet}/texts/${text}/comments/${comment}/unvote`);
   const [toggleReply, setToggleReply] = useState(false);
   const [up, setUpvote] = useState(false);
   const [down, setDownvote] = useState(false);
@@ -90,41 +93,51 @@ const Comment = props => {
     userInfo = jwtDecode(token);
   }
 
-  const upvoted = async (jet, post, comment) => {
+  const upvoted = async (jet, text, comment) => {
     if (up) {
-      await unvote(jet, post, comment).then(() => setUpvote(false));
+      await unvote(jet, text, comment).then(() => setUpvote(false));
     } else {
-      await upvote(jet, post, comment).then(() => setUpvote(true));
+      await upvote(jet, text, comment).then(() => setUpvote(true));
     }
 
     setUpdateComment(true);
   };
 
-  const downvoted = async (jet, post, comment) => {
+  const downvoted = async (jet, text, comment) => {
     if (down) {
-      await unvote(jet, post, comment).then(() => setDownvote(false));
+      await unvote(jet, text, comment).then(() => setDownvote(false));
     } else {
-      await downvote(jet, post, comment).then(() => setDownvote(true));
+      await downvote(jet, text, comment).then(() => setDownvote(true));
     }
 
     setUpdateComment(true);
   };
 
-  const switchVote = async (jet, post, comment) => {
-    await unvote(jet, post, comment).then(() => {
+  const switchVote = async (jet, text, comment) => {
+    await unvote(jet, text, comment).then(() => {
       setUpvote(false);
       setDownvote(false);
     });
 
     if (up) {
-      downvoted(jet, post, comment);
+      downvoted(jet, text, comment);
     }
 
     if (down) {
-      upvoted(jet, post, comment);
+      upvoted(jet, text, comment);
     }
 
     setUpdateComment(true);
+  };
+
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const removeComment = () => {
+    dispatch(deleteComment(jetId, textId, linkId, commentId)).then(response => {
+      if (response.status === 204) {
+        router.reload();
+      }
+    });
   };
 
   return (
@@ -135,16 +148,16 @@ const Comment = props => {
             <ArrowUp
               onClick={
                 !down
-                  ? () => upvoted(jetId, postId, commentId)
-                  : () => switchVote(jetId, postId, commentId)
+                  ? () => upvoted(jetId, textId, commentId)
+                  : () => switchVote(jetId, textId, commentId)
               }
               className={up ? classes.voted : ''}
             />
             <ArrowDown
               onClick={
                 !up
-                  ? () => downvoted(jetId, postId, commentId)
-                  : () => switchVote(jetId, postId, commentId)
+                  ? () => downvoted(jetId, textId, commentId)
+                  : () => switchVote(jetId, textId, commentId)
               }
               className={down ? classes.voted : ''}
             />
@@ -177,7 +190,6 @@ const Comment = props => {
                   &nbsp;ago
                 </Typography>
                 <Divider />
-
                 <Typography variant="h6" component="p">
                   {body}
                 </Typography>
@@ -194,7 +206,9 @@ const Comment = props => {
                   </Button>
                 </Can>
                 <Can do="delete" on={comment}>
-                  <Button size="small">delete</Button>
+                  <Button size="small" clicked={() => removeComment()}>
+                    delete
+                  </Button>
                 </Can>
               </CardActions>
             </div>

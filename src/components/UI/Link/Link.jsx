@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Moment from 'moment';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -10,10 +12,10 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import ArrowUp from '@material-ui/icons/ArrowUpward';
 import ArrowDown from '@material-ui/icons/ArrowDownward';
-import Divider from '@material-ui/core/Divider';
 
 import axios from '../../../services/axios/axios-forum';
 import Can from '../../Permissions/Can';
+import { deleteLink } from '../../../store/actions';
 
 const useStyles = makeStyles({
   card: {
@@ -116,6 +118,16 @@ const LinkUI = props => {
     setUpdatelink(true);
   };
 
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const removeLink = () => {
+    dispatch(deleteLink(jetId, linkId)).then(response => {
+      if (response.status === 204) {
+        router.reload();
+      }
+    });
+  };
+
   return (
     <Card className={classes.card}>
       <div className={classes.votes}>
@@ -153,8 +165,7 @@ const LinkUI = props => {
             &nbsp;&bull; posted by&nbsp;
             <Link href="/user/[username]" as={`/user/${username}`}>
               <span className={classes.user}>
-                u/
-                {username}
+                {username === '[deleted]' ? username : `u/${username}`}
               </span>
             </Link>
             &nbsp;
@@ -173,8 +184,8 @@ const LinkUI = props => {
             as={`/j/${jetId}/link/${linkId}`}
           >
             <Button size="small">
-              <span>{comments}</span>
-              &nbsp;comments
+              comments&nbsp;
+              <span>({comments})</span>
             </Button>
           </Link>
           <Can do="update" on={link}>
@@ -186,7 +197,9 @@ const LinkUI = props => {
             </Link>
           </Can>
           <Can do="delete" on={link}>
-            <Button size="small">delete</Button>
+            <Button size="small" onClick={() => removeLink}>
+              delete
+            </Button>
           </Can>
         </CardActions>
       </div>

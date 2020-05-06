@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { Alert } from '@material-ui/lab';
 import Input from '../components/UI/Input/Input';
 import Button from '../components/UI/Button/Button';
 import {
@@ -12,10 +13,6 @@ import {
 import { register } from '../store/actions/index';
 
 const Signup = () => {
-  const error = useSelector(state => state.register.error);
-  const dispatch = useDispatch();
-  const router = useRouter();
-
   const [form, setForm] = useState({
     controls: {
       username: {
@@ -86,6 +83,8 @@ const Signup = () => {
     setForm({ controls: updatedControls });
   };
 
+  const dispatch = useDispatch();
+  const router = useRouter();
   const submitHandler = event => {
     event.preventDefault();
 
@@ -101,10 +100,7 @@ const Signup = () => {
           router.push('/');
         }
       })
-      .catch(err => {
-        console.log('err on register submitHandler', err);
-        console.log('props', this.props);
-      });
+      .catch(err => router.reload());
   };
 
   const formElementsArray = [];
@@ -129,17 +125,16 @@ const Signup = () => {
     />
   ));
 
+  const error = useSelector(state => state.register.error);
   let errorMessage = null;
   if (error) {
     errorMessage = Object.entries(error).map(([key, value], i) => {
       const field = key.charAt(0).toUpperCase() + key.slice(1);
 
       return (
-        <p key={key} style={{ color: 'red' }}>
-          <span>
-            {field}: {value}
-          </span>
-        </p>
+        <Alert key={key} severity="error">
+          {field}: {value}
+        </Alert>
       );
     });
   }
@@ -156,6 +151,10 @@ const Signup = () => {
       </div>
     </div>
   );
+};
+
+export const getStaticProps = async () => {
+  return { props: {} };
 };
 
 export default Signup;

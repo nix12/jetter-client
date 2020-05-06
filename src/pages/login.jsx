@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useRouter } from 'next/router';
 
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
+import { Alert } from '@material-ui/lab';
 import Input from '../components/UI/Input/Input';
 import Button from '../components/UI/Button/Button';
 import { ability } from '../services/casl/ability';
@@ -43,8 +45,6 @@ const Login = () => {
     }
   });
 
-  const dispatch = useDispatch();
-
   const username = useSelector(state => state.auth.currentUser.username);
   const userId = useSelector(state => state.auth.currentUser.userId);
   const roles = useSelector(state => state.auth.currentUser.roles);
@@ -66,9 +66,19 @@ const Login = () => {
     setForm({ controls: updatedControls });
   };
 
+  const dispatch = useDispatch();
+  const router = useRouter();
   const submitHandler = event => {
     event.preventDefault();
-    dispatch(auth(form.controls.username.value, form.controls.password.value));
+    dispatch(
+      auth(form.controls.username.value, form.controls.password.value)
+    ).then(response => {
+      if (response.status === 200) {
+        router.push('/');
+      } else {
+        router.reload();
+      }
+    });
   };
 
   const formElementsArray = [];
@@ -98,7 +108,7 @@ const Login = () => {
 
   let errorMessage = null;
   if (error) {
-    errorMessage = <h5 style={{ color: 'red' }}>{error}</h5>;
+    errorMessage = <Alert severity="error">{error}</Alert>;
   }
 
   const rolesList = roles
@@ -133,6 +143,10 @@ const Login = () => {
       </div>
     </div>
   );
+};
+
+export const getStaticProps = async () => {
+  return { props: {} };
 };
 
 export default Login;

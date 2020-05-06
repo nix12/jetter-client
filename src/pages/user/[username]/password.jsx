@@ -4,6 +4,7 @@ import Cookies from 'universal-cookie';
 import jwtDecode from 'jwt-decode';
 
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
+import { Alert } from '@material-ui/lab';
 import Input from '../../../components/UI/Input/Input';
 import Button from '../../../components/UI/Button/Button';
 import Can from '../../../components/Permissions/Can';
@@ -152,9 +153,8 @@ const UpdateUser = () => {
   }
 
   let errorMessage = null;
-
   if (error) {
-    errorMessage = <p style={{ color: 'red' }}>{error}</p>;
+    errorMessage = <Alert severity="error">{error}</Alert>;
   }
 
   return (

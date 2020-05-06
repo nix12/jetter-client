@@ -27,14 +27,14 @@ const JetList = props => {
     setLoading(false);
   }, []);
 
-  const jets = list.map((post, index) => {
+  const jets = list.map((text, index) => {
     const separator = index <= 6 ? <span>|</span> : null;
 
     while (index <= 8) {
       return (
-        <div key={post.id} className={classes.center}>
-          <Link href="/j/[jetId]" as={`/j/${post.name}`}>
-            <Button>{post.name}</Button>
+        <div key={text.id} className={classes.center}>
+          <Link href="/j/[jetId]" as={`/j/${text.name}`}>
+            <Button>{text.name}</Button>
           </Link>
           {separator}
         </div>

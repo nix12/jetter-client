@@ -7,7 +7,7 @@ const initialState = {
     userId: null,
     username: null,
     roles: [],
-    rules: null,
+    rules: [],
     loading: false,
     error: null
   }

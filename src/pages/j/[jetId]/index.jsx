@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import _ from 'lodash';
 
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
-import Post from '../../../components/UI/Post/Post';
+import Text from '../../../components/UI/Text/Text';
 import LinkUI from '../../../components/UI/Link/Link';
 
 import axios from '../../../services/axios/axios-forum';
@@ -12,7 +12,7 @@ const Jet = props => {
   const { jetData } = props;
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(jetData);
-  const [updatePost, setUpdatePost] = useState(false);
+  const [updateText, setUpdateText] = useState(false);
   const router = useRouter();
   const { jetId } = router.query;
   let posts;
@@ -35,15 +35,15 @@ const Jet = props => {
           updatedAt={post.updated_at}
           username={post.voter_id}
           score={post.cached_votes_score}
-          setUpdatePost={setUpdatePost}
+          setUpdateText={setUpdateText}
         />
       ) : (
-        <Post
+        <Text
           key={post.hash_id}
-          post={{ __type: 'Post', ...post }}
+          text={{ __type: 'Text', ...post }}
           comments={post.comments_count}
           createdAt={post.created_at}
-          postId={post.hash_id}
+          textId={post.hash_id}
           jetId={post.jet_id}
           title={post.title}
           body={post.body}
@@ -51,7 +51,7 @@ const Jet = props => {
           updatedAt={post.updated_at}
           username={post.voter_id}
           score={post.cached_votes_score}
-          setUpdatePost={setUpdatePost}
+          setUpdateText={setUpdateText}
         />
       )
     );
@@ -73,13 +73,13 @@ const Jet = props => {
 
     useEffect(() => {
       const fetchJet = async () => {
-        const jetPosts = await axios.get(`/api/jets/${jetId}`);
+        const jetTexts = await axios.get(`/api/jets/${jetId}`);
 
-        updateCurrent(jetPosts.data);
-        setData(jetPosts.data);
+        updateCurrent(jetTexts.data);
+        setData(jetTexts.data);
 
-        if (updatePost) {
-          setUpdatePost(false);
+        if (updateText) {
+          setUpdateText(false);
         }
       };
 
@@ -89,7 +89,7 @@ const Jet = props => {
 
       fetchJet();
       setLoading(false);
-    }, [updatePost, jetId]);
+    }, [updateText, jetId]);
   };
 
   useDeepComparison(jetData);
@@ -100,9 +100,9 @@ const Jet = props => {
 Jet.getInitialProps = async ({ query }) => {
   const { jetId } = query;
   const url = `/api/jets/${jetId}`;
-  const jetPosts = await axios.get(url);
+  const jetTexts = await axios.get(url);
 
-  return { jetData: jetPosts.data };
+  return { jetData: jetTexts.data };
 };
 
 export default Jet;

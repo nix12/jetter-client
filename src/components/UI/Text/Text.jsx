@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import Moment from 'moment';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -14,6 +16,7 @@ import Divider from '@material-ui/core/Divider';
 
 import axios from '../../../services/axios/axios-forum';
 import Can from '../../Permissions/Can';
+import { deleteText } from '../../../store/actions';
 
 const useStyles = makeStyles({
   card: {
@@ -50,26 +53,26 @@ const useStyles = makeStyles({
   }
 });
 
-const Post = props => {
+const Text = props => {
   const {
-    post,
+    text,
     username,
     createdAt,
     score,
     jetId,
-    postId,
+    textId,
     title,
     body,
     comments,
-    setUpdatePost
+    setUpdateText
   } = props;
 
-  const upvote = (jet, post) =>
-    axios.put(`/api/jets/${jet}/posts/${post}/upvote`);
-  const downvote = (jet, post) =>
-    axios.put(`/api/jets/${jet}/posts/${post}/downvote`);
-  const unvote = (jet, post) =>
-    axios.put(`/api/jets/${jet}/posts/${post}/unvote`);
+  const upvote = (jet, text) =>
+    axios.put(`/api/jets/${jet}/texts/${text}/upvote`);
+  const downvote = (jet, text) =>
+    axios.put(`/api/jets/${jet}/texts/${text}/downvote`);
+  const unvote = (jet, text) =>
+    axios.put(`/api/jets/${jet}/texts/${text}/unvote`);
 
   const classes = useStyles();
   const now = new Moment();
@@ -79,41 +82,51 @@ const Post = props => {
   const [up, setUpvote] = useState(false);
   const [down, setDownvote] = useState(false);
 
-  const upvoted = async (jet, post) => {
+  const upvoted = async (jet, text) => {
     if (up) {
-      await unvote(jet, post).then(() => setUpvote(false));
+      await unvote(jet, text).then(() => setUpvote(false));
     } else {
-      await upvote(jet, post).then(() => setUpvote(true));
+      await upvote(jet, text).then(() => setUpvote(true));
     }
 
-    setUpdatePost(true);
+    setUpdateText(true);
   };
 
-  const downvoted = async (jet, post) => {
+  const downvoted = async (jet, text) => {
     if (down) {
-      await unvote(jet, post).then(() => setDownvote(false));
+      await unvote(jet, text).then(() => setDownvote(false));
     } else {
-      await downvote(jet, post).then(() => setDownvote(true));
+      await downvote(jet, text).then(() => setDownvote(true));
     }
 
-    setUpdatePost(true);
+    setUpdateText(true);
   };
 
-  const switchVote = async (jet, post) => {
-    await unvote(jet, post).then(() => {
+  const switchVote = async (jet, text) => {
+    await unvote(jet, text).then(() => {
       setUpvote(false);
       setDownvote(false);
     });
 
     if (up) {
-      downvoted(jet, post);
+      downvoted(jet, text);
     }
 
     if (down) {
-      upvoted(jet, post);
+      upvoted(jet, text);
     }
 
-    setUpdatePost(true);
+    setUpdateText(true);
+  };
+
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const removeText = () => {
+    dispatch(deleteText(jetId, textId)).then(response => {
+      if (response.status === 204) {
+        router.reload();
+      }
+    });
   };
 
   return (
@@ -122,8 +135,8 @@ const Post = props => {
         <ArrowUp
           onClick={
             !down
-              ? () => upvoted(jetId, postId)
-              : () => switchVote(jetId, postId)
+              ? () => upvoted(jetId, textId)
+              : () => switchVote(jetId, textId)
           }
           className={up ? classes.voted : ''}
         />
@@ -131,8 +144,8 @@ const Post = props => {
         <ArrowDown
           onClick={
             !up
-              ? () => downvoted(jetId, postId)
-              : () => switchVote(jetId, postId)
+              ? () => downvoted(jetId, textId)
+              : () => switchVote(jetId, textId)
           }
           className={down ? classes.voted : ''}
         />
@@ -153,8 +166,7 @@ const Post = props => {
             &nbsp;&bull; Posted by&nbsp;
             <Link href="/user/[username]" as={`/user/${username}`}>
               <span className={classes.user}>
-                u/
-                {username}
+                {username === '[deleted]' ? username : `u/${username}`}
               </span>
             </Link>
             &nbsp;
@@ -162,8 +174,8 @@ const Post = props => {
             &nbsp;ago
           </Typography>
           <Link
-            href="/j/[jetId]/post/[postId]"
-            as={`/j/${jetId}/post/${postId}`}
+            href="/j/[jetId]/text/[textId]"
+            as={`/j/${jetId}/text/${textId}`}
           >
             <a style={{ textDecoration: 'none' }}>
               <Typography variant="h6" component="p">
@@ -178,24 +190,26 @@ const Post = props => {
         </CardContent>
         <CardActions>
           <Link
-            href="/j/[jetId]/post/[postId]"
-            as={`/j/${jetId}/post/${postId}`}
+            href="/j/[jetId]/text/[textId]"
+            as={`/j/${jetId}/text/${textId}`}
           >
             <Button size="small">
               <span>{comments}</span>
               &nbsp;comments
             </Button>
           </Link>
-          <Can do="update" on={post}>
+          <Can do="update" on={text}>
             <Link
-              href="/j/[jetId]/post/[postId]/edit"
-              as={`/j/${jetId}/post/${postId}/edit`}
+              href="/j/[jetId]/text/[textId]/edit"
+              as={`/j/${jetId}/text/${textId}/edit`}
             >
               <Button size="small">edit</Button>
             </Link>
           </Can>
-          <Can do="delete" on={post}>
-            <Button size="small">delete</Button>
+          <Can do="delete" on={text}>
+            <Button size="small" onClick={() => removeText}>
+              delete
+            </Button>
           </Can>
         </CardActions>
       </div>
@@ -203,4 +217,4 @@ const Post = props => {
   );
 };
 
-export default Post;
+export default Text;

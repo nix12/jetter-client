@@ -14,10 +14,14 @@ const Logout = () => {
           router.push('/login');
         }
       })
-      .catch(router.push('/'));
+      .catch(router.reload());
   }, []);
 
   return null;
+};
+
+export const getStaticProps = async () => {
+  return { props: {} };
 };
 
 export default Logout;

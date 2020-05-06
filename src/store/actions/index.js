@@ -6,8 +6,8 @@ export { update } from './user';
 
 export { createJet } from './jet';
 
-export { createPost, updatePost } from './post';
+export { createText, updateText, deleteText } from './text';
 
-export { createLink, updateLink } from './link';
+export { createLink, updateLink, deleteLink } from './link';
 
-export { createComment, updateComment } from './comment';
+export { createComment, updateComment, deleteComment } from './comment';

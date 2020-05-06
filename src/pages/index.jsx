@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import _ from 'lodash';
 import axios from '../services/axios/axios-forum';
 
-import Post from '../components/UI/Post/Post';
+import Text from '../components/UI/Text/Text';
 import LinkUI from '../components/UI/Link/Link';
 
 const all = props => {
   const { allData } = props;
 
   const [data, setData] = useState(allData);
-  const [updatePost, setUpdatePost] = useState(false);
+  const [updateText, setUpdateText] = useState(false);
 
   const posts = data.map(post =>
     post.uri ? (
@@ -26,22 +25,22 @@ const all = props => {
         updatedAt={post.updated_at}
         username={post.voter_id}
         score={post.cached_votes_score}
-        setUpdatePost={setUpdatePost}
+        setUpdateText={setUpdateText}
       />
     ) : (
-      <Post
+      <Text
         key={post.hash_id}
-        post={{ ...post, __type: 'Post' }}
+        text={{ ...post, __type: 'Text' }}
         comments={post.comments_count}
         createdAt={post.created_at}
         jetId={post.jet_id}
-        postId={post.hash_id}
+        textId={post.hash_id}
         title={post.title}
         uri={post.uri}
         updatedAt={post.updated_at}
         username={post.voter_id}
         score={post.cached_votes_score}
-        setUpdatePost={setUpdatePost}
+        setUpdateText={setUpdateText}
       />
     )
   );
@@ -60,12 +59,12 @@ const all = props => {
 
     useEffect(() => {
       const fetchAll = async () => {
-        const allPosts = await axios.get('/api/all');
+        const allTexts = await axios.get('/api/all');
 
-        updateCurrent(allPosts.data);
+        updateCurrent(allTexts.data);
 
-        if (updatePost) {
-          setUpdatePost(false);
+        if (updateText) {
+          setUpdateText(false);
         }
       };
 
@@ -74,7 +73,7 @@ const all = props => {
       }
 
       fetchAll();
-    }, [updatePost]);
+    }, [updateText]);
   };
 
   useDeepComparison(allData);
@@ -84,9 +83,9 @@ const all = props => {
 
 all.getInitialProps = async () => {
   const url = '/api/all';
-  const allPosts = await axios.get(url);
+  const allTexts = await axios.get(url);
 
-  return { allData: allPosts.data };
+  return { allData: allTexts.data };
 };
 
 export default all;

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 
+import { Alert } from '@material-ui/lab';
 import Input from '../UI/Input/Input';
 import Button from '../UI/Button/Button';
 import { updateObject, checkValidity } from '../../shared/utility';
@@ -59,18 +60,30 @@ const CommentForm = props => {
     setForm({ controls: updatedControls });
   };
 
-  const submitUpdateHandler = event => {
+  const submitHandler = event => {
     event.preventDefault();
 
-    const { jetId, postId } = router.query;
+    const { jetId, textId, linkId } = router.query;
+
+    let type;
+    if (commentId) {
+      type = 'Comment';
+    } else {
+      if (textId) {
+        type = 'Text';
+      }
+
+      type = 'Link';
+    }
 
     dispatch(
       createComment(
         form.controls.body.value,
         jetId,
-        postId,
-        commentId || postId,
-        commentId ? 'Comment' : 'Post',
+        textId || null,
+        linkId || null,
+        commentId || textId || linkId,
+        type,
         commentId || null
       )
     ).then(response => {
@@ -94,16 +107,28 @@ const CommentForm = props => {
   const submitEditHandler = event => {
     event.preventDefault();
 
-    const { jetId, postId } = router.query;
+    const { jetId, textId, linkId } = router.query;
+
+    let type;
+    if (commentId) {
+      type = 'Comment';
+    } else {
+      if (textId) {
+        type = 'Text';
+      }
+
+      type = 'Link';
+    }
 
     dispatch(
       updateComment(
         form.controls.body.value,
         jetId,
-        postId,
-        commentId || postId,
-        commentId ? 'Comment' : 'Post',
-        commentId
+        textId || null,
+        linkId || null,
+        commentId || textId || linkId,
+        type,
+        commentId || null
       )
     ).then(response => {
       if (response.status === 204) {
@@ -132,7 +157,6 @@ const CommentForm = props => {
   });
 
   let formOutput = null;
-
   if (isLoggedIn) {
     formOutput = formElementsArray.map(formElement => (
       <div key={formElement.id}>
@@ -159,10 +183,40 @@ const CommentForm = props => {
     ));
   }
 
+  const [alertPresent, setAlertPresent] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const error = useSelector(state => state.comment.error);
+  // let errorMessage = null;
+  useEffect(() => {
+    if (error && alertPresent === false) {
+      console.log('Alert');
+
+      setErrorMessage(
+        Object.entries(error).map(([key, value]) => {
+          const field = key.charAt(0).toUpperCase() + key.slice(1);
+
+          return value.map(v => (
+            <Alert key={v} severity="error">
+              {field}: {v}
+            </Alert>
+          ));
+        })
+      );
+      console.log('[before]', alertPresent);
+      console.log(setAlertPresent(true));
+      console.log('[after]', alertPresent);
+    }
+    console.log('[after]', alertPresent);
+    console.log(errorMessage);
+  }, [alertPresent, errorMessage]);
+
   return toggle || edit ? (
-    <form onSubmit={edit ? submitEditHandler : submitUpdateHandler}>
-      {formOutput}
-    </form>
+    <div>
+      {errorMessage}
+      <form onSubmit={edit ? submitEditHandler : submitHandler}>
+        {formOutput}
+      </form>
+    </div>
   ) : null;
 };
 

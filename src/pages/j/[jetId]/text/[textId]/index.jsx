@@ -3,21 +3,21 @@ import { useRouter } from 'next/router';
 import _ from 'lodash';
 
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
-import Post from '../../../../../components/UI/Post/Post';
+import Text from '../../../../../components/UI/Text/Text';
 import Comment from '../../../../../components/UI/Comment/Comment';
 import CommentForm from '../../../../../components/Forms/Comment';
 
 import axios from '../../../../../services/axios/axios-forum';
 
 const Show = props => {
-  const { postData } = props;
+  const { textData } = props;
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(postData);
-  const [updatePost, setUpdatePost] = useState(false);
+  const [data, setData] = useState(textData);
+  const [updateText, setUpdateText] = useState(false);
   const [updateComment, setUpdateComment] = useState(false);
   const [toggleReply, setToggleReply] = useState(true);
   const router = useRouter();
-  const { jetId, postId } = router.query;
+  const { jetId, textId } = router.query;
   let comments;
 
   const renderComment = comment => {
@@ -60,11 +60,11 @@ const Show = props => {
   //   const [current, updateCurrent] = useState([]);
 
   useEffect(() => {
-    const fetchPost = async () => {
-      const postData = await axios.get(`/api/jets/${jetId}/posts/${postId}`);
+    const fetchText = async () => {
+      const textData = await axios.get(`/api/jets/${jetId}/texts/${textId}`);
 
-      // updateCurrent(postData.data);
-      setData(postData.data);
+      // updateCurrent(textData.data);
+      setData(textData.data);
       if (updateComment) {
         setUpdateComment(false);
       }
@@ -74,30 +74,30 @@ const Show = props => {
     //   setData(current);
     // }
 
-    // linkId ? fetchLink() : fetchPost();
+    // linkId ? fetchLink() : fetchText();
 
-    fetchPost();
+    fetchText();
     setLoading(false);
-  }, [updateComment, updatePost, postId]);
+  }, [updateComment, updateText, textId]);
   // };
 
-  // useDeepComparison(postData);
+  // useDeepComparison(textData);
 
   return (
     <div>
-      <Post
-        post={{ __type: 'Post', ...data.post }}
-        body={data.post.body}
-        comments={data.post.comments_count}
-        createdAt={data.post.created_at}
-        jetId={data.post.jet_id}
-        postId={data.post.hash_id}
-        title={data.post.title}
-        uri={data.post.uri}
-        updatedAt={data.post.updated_at}
-        username={data.post.voter_id}
-        score={data.post.cached_votes_score}
-        setUpdatePost={setUpdatePost}
+      <Text
+        text={{ __type: 'Text', ...data.text }}
+        body={data.text.body}
+        comments={data.text.comments_count}
+        createdAt={data.text.created_at}
+        jetId={data.text.jet_id}
+        textId={data.text.hash_id}
+        title={data.text.title}
+        uri={data.text.uri}
+        updatedAt={data.text.updated_at}
+        username={data.text.voter_id}
+        score={data.text.cached_votes_score}
+        setUpdateText={setUpdateText}
       />
       <CommentForm
         rows="15"
@@ -112,11 +112,11 @@ const Show = props => {
 };
 
 Show.getInitialProps = async ({ query }) => {
-  const { jetId, postId } = query;
-  const url = `/api/jets/${jetId}/posts/${postId}`;
-  const post = await axios.get(url);
+  const { jetId, textId } = query;
+  const url = `/api/jets/${jetId}/texts/${textId}`;
+  const text = await axios.get(url);
 
-  return { postData: post.data };
+  return { textData: text.data };
 };
 
 export default Show;

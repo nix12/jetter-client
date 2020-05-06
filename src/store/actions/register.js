@@ -39,6 +39,7 @@ export const register = (username, password) => dispatch => {
       dispatch(registerSuccess());
     })
     .catch(err => {
+      console.log(err.response.data.errors);
       const errorData = [];
       const error = {};
 

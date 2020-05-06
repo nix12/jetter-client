@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 
+import { Alert } from '@material-ui/lab';
 import Button from '../UI/Button/Button';
 import Input from '../UI/Input/Input';
 
@@ -10,7 +11,6 @@ import { createLink } from '../../store/actions/index';
 
 const LinkForm = props => {
   const { value, index } = props;
-  const { error } = props;
 
   const [form, setForm] = useState({
     controls: {
@@ -32,7 +32,7 @@ const LinkForm = props => {
         elementType: 'input',
         elementConfig: {
           type: 'text',
-          placeholder: 'URL'
+          placeholder: 'URI'
         },
         value: '',
         validation: {
@@ -44,9 +44,6 @@ const LinkForm = props => {
       }
     }
   });
-
-  const router = useRouter();
-  const dispatch = useDispatch();
 
   const inputChangedHandler = (event, controlName) => {
     const updatedControls = updateObject(form.controls, {
@@ -63,6 +60,8 @@ const LinkForm = props => {
     setForm({ controls: updatedControls });
   };
 
+  const router = useRouter();
+  const dispatch = useDispatch();
   const submitHandler = event => {
     event.preventDefault();
 
@@ -99,20 +98,17 @@ const LinkForm = props => {
     />
   ));
 
+  const error = useSelector(state => state.link.error);
   let errorMessage = null;
-
   if (error) {
-    Object.entries(error).map(([key, value]) => {
+    errorMessage = Object.entries(error).map(([key, value]) => {
       const field = key.charAt(0).toUpperCase() + key.slice(1);
 
-      errorMessage = (
-        <div>
-          <span>{field}</span>
-          <span>{value}</span>
-        </div>
-      );
-
-      return errorMessage;
+      return value.map(v => (
+        <Alert key={v} severity="error">
+          {field}: {v}
+        </Alert>
+      ));
     });
   }
 

@@ -6,7 +6,6 @@ import { Provider } from 'react-redux';
 import App from 'next/app';
 import Head from 'next/head';
 import withRedux from 'next-redux-wrapper';
-import Cookies from 'universal-cookie';
 
 import { ThemeProvider } from '@material-ui/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -16,8 +15,9 @@ import authReducer from '../store/reducers/auth';
 import registerReducer from '../store/reducers/register';
 import userReducer from '../store/reducers/user';
 import jetReducer from '../store/reducers/jet';
-
-import redirectTo from '../shared/redirectTo';
+import textReducer from '../store/reducers/text';
+import linkReducer from '../store/reducers/link';
+import commentReducer from '../store/reducers/comment';
 
 import Layout from '../containers/Layout/Layout';
 
@@ -25,7 +25,10 @@ const rootReducer = combineReducers({
   auth: authReducer,
   register: registerReducer,
   user: userReducer,
-  jet: jetReducer
+  jet: jetReducer,
+  text: textReducer,
+  link: linkReducer,
+  comment: commentReducer
 });
 
 const makeStore = (initialState, options) =>
@@ -33,18 +36,9 @@ const makeStore = (initialState, options) =>
 
 class MyApp extends App {
   static async getInitialProps({ Component, ctx }) {
-    const cookies = new Cookies();
     const pageProps = Component.getInitialProps
       ? await Component.getInitialProps(ctx)
       : {};
-
-    // if (typeof cookies.get('token') === 'undefined') {
-    //   if (ctx.pathname === '/auth' || ctx.pathname === '/user/new') {
-    //     return { pageProps };
-    //   }
-    //   redirectTo('/auth', '/login', { res: ctx.res, status: 301 });
-    // } else {
-    // }
 
     return { pageProps };
   }

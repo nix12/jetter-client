@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useRouter } from 'next/router';
 
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-
-import PostForm from '../../../components/Forms/Post';
+import TextForm from '../../../components/Forms/Text';
 import LinkForm from '../../../components/Forms/Link';
 
 const allyProps = index => {
@@ -15,7 +12,7 @@ const allyProps = index => {
   };
 };
 
-const NewPost = props => {
+const NewText = props => {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -39,10 +36,18 @@ const NewPost = props => {
           {...allyProps(1)}
         />
       </Tabs>
-      <PostForm value={value} index={0} />
+      <TextForm value={value} index={0} />
       <LinkForm value={value} index={1} />
     </div>
   );
 };
 
-export default NewPost;
+// export const getStaticProps = async () => {
+//   return { props: {} };
+// };
+
+// export const getStaticPaths = async () => {
+//   return { paths: [{ params: { jetId } }] };
+// };
+
+export default NewText;

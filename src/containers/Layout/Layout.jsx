@@ -6,6 +6,7 @@ import _ from 'lodash';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+// import { Alert } from '@material-ui/lab';
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import Button from '@material-ui/core/Button';
 
@@ -45,8 +46,7 @@ const Layout = props => {
   const dispatch = useDispatch();
   const username = useSelector(state => state.auth.currentUser.username);
   const isLoggedIn = useSelector(state => state.auth.currentUser.isLoggedIn);
-  // const error = useSelector(state => state.jet.error);
-  // console.log('[NewJet] error', error);
+  // const error = useSelector(state => state.auth.error);
   const { jetId } = router.query;
 
   useEffect(() => setLoading(false), [loading]);
@@ -54,18 +54,7 @@ const Layout = props => {
 
   // let errorMessage = null;
   // if (error) {
-  //   Object.entries(error).map(([key, value]) => {
-  //     const field = key.charAt(0).toUpperCase() + key.slice(1);
-
-  //     errorMessage = (
-  //       <div>
-  //         <span>{field}</span>
-  //         <span>{value}</span>
-  //       </div>
-  //     );
-
-  //     return errorMessage;
-  //   });
+  //   errorMessage = <Alert severity="error">{error}</Alert>;
   // }
 
   return (

@@ -6,11 +6,11 @@ import Button from '../../../../../components/UI/Button/Button';
 import Input from '../../../../../components/UI/Input/Input';
 
 import { updateObject, checkValidity } from '../../../../../shared/utility';
-import { updatePost } from '../../../../../store/actions/index';
+import { updateText } from '../../../../../store/actions/index';
 
 import axios from '../../../../../services/axios/axios-forum';
 
-const editPost = props => {
+const editText = props => {
   const { error } = props;
 
   const [form, setForm] = useState({
@@ -52,9 +52,9 @@ const editPost = props => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchPost = async () => {
-      const { jetId, postId } = router.query;
-      const postData = await axios.get(`/api/jets/${jetId}/posts/${postId}`);
+    const fetchText = async () => {
+      const { jetId, textId } = router.query;
+      const textData = await axios.get(`/api/jets/${jetId}/texts/${textId}`);
 
       setForm(prevState => ({
         ...prevState,
@@ -62,17 +62,17 @@ const editPost = props => {
           ...prevState.controls,
           title: {
             ...prevState.title,
-            value: postData.data.post.title
+            value: textData.data.text.title
           },
           body: {
             ...prevState.body,
-            value: postData.data.post.body
+            value: textData.data.text.body
           }
         }
       }));
     };
 
-    fetchPost();
+    fetchText();
   }, []);
 
   const inputChangedHandler = (event, controlName) => {
@@ -93,18 +93,18 @@ const editPost = props => {
   const submitHandler = event => {
     event.preventDefault();
 
-    const { jetId, postId } = router.query;
+    const { jetId, textId } = router.query;
 
     dispatch(
-      updatePost(
+      updateText(
         form.controls.title.value,
         form.controls.body.value,
         jetId,
-        postId
+        textId
       )
     ).then(response => {
       if (response.status === 204) {
-        router.push('/j/[jetId]/post/[postId]', `/j/${jetId}/post/${postId}`);
+        router.push('/j/[jetId]/text/[textId]', `/j/${jetId}/text/${textId}`);
       }
     });
   };
@@ -150,7 +150,7 @@ const editPost = props => {
 
   return (
     <div>
-      <h1>New Post</h1>
+      <h1>New Text</h1>
 
       <div>
         {errorMessage}
@@ -163,4 +163,4 @@ const editPost = props => {
   );
 };
 
-export default editPost;
+export default editText;

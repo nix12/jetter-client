@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 
+import { Alert } from '@material-ui/lab';
 import Button from '../../components/UI/Button/Button';
 import Input from '../../components/UI/Input/Input';
 import { updateObject, checkValidity } from '../../shared/utility';
@@ -102,18 +103,17 @@ const NewJet = () => {
   ));
 
   let errorMessage = null;
-
   if (error) {
     errorMessage = Object.entries(error).map(([key, value]) => {
-      const field = key.charAt(0).toUpperCase() + key.slice(1);
+      return value.map(v => {
+        const field = key.charAt(0).toUpperCase() + key.slice(1);
 
-      return (
-        <div key={field} style={{ color: 'red' }}>
-          <span>
-            {field}: {value}
-          </span>
-        </div>
-      );
+        return (
+          <Alert key={v} severity="error">
+            {field}: {v}
+          </Alert>
+        );
+      });
     });
   }
 
@@ -129,6 +129,10 @@ const NewJet = () => {
       </div>
     </div>
   );
+};
+
+export const getStaticProps = async () => {
+  return { props: {} };
 };
 
 export default NewJet;

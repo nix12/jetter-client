@@ -20,14 +20,18 @@ export const createJet = (name, description) => dispatch => {
     .catch(err => {
       const errorData = [];
       const error = {};
-      console.log(err.response);
+
       Object.entries(err.response.data.errors).forEach(([key, value]) => {
         /* eslint prefer-destructuring: ["error", {VariableDeclarator: {object: true}}] */
-        Object.values(value).map(v => {
-          error[key] = v;
-          errorData.push(error);
-        });
-        console.log(errorData);
+
+        error[key] = value;
+        errorData.push(error);
+        // Object.values(value).map(v => {
+        //   error[key] = v;
+        //   console.log(error);
+        //   errorData.push([error]);
+        // });
+        // console.log(errorData);
       });
 
       dispatch(jetFail(errorData[0]));

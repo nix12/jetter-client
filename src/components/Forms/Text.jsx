@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 
+import { Alert } from '@material-ui/lab';
 import Button from '../UI/Button/Button';
 import Input from '../UI/Input/Input';
 
 import { updateObject, checkValidity } from '../../shared/utility';
-import { createPost } from '../../store/actions/index';
+import { createText } from '../../store/actions/index';
 
-const PostForm = props => {
+const TextForm = props => {
   const { value, index } = props;
-  const { error } = props;
 
   const [form, setForm] = useState({
     controls: {
@@ -47,9 +47,6 @@ const PostForm = props => {
     }
   });
 
-  const router = useRouter();
-  const dispatch = useDispatch();
-
   const inputChangedHandler = (event, controlName) => {
     const updatedControls = updateObject(form.controls, {
       [controlName]: updateObject(form.controls[controlName], {
@@ -65,16 +62,18 @@ const PostForm = props => {
     setForm({ controls: updatedControls });
   };
 
+  const router = useRouter();
+  const dispatch = useDispatch();
   const submitHandler = event => {
     event.preventDefault();
 
     const { jetId } = router.query;
 
     dispatch(
-      createPost(form.controls.title.value, form.controls.body.value, jetId)
+      createText(form.controls.title.value, form.controls.body.value, jetId)
     ).then(response => {
       if (response.status === 201) {
-        router.push('/j/[jetId]', `/j/${jetId}`);
+        router.reload();
       }
     });
   };
@@ -101,20 +100,17 @@ const PostForm = props => {
     />
   ));
 
+  const error = useSelector(state => state.text.error);
   let errorMessage = null;
-
   if (error) {
-    Object.entries(error).map(([key, value]) => {
+    errorMessage = Object.entries(error).map(([key, value]) => {
       const field = key.charAt(0).toUpperCase() + key.slice(1);
 
-      errorMessage = (
-        <div>
-          <span>{field}</span>
-          <span>{value}</span>
-        </div>
-      );
-
-      return errorMessage;
+      return value.map(v => (
+        <Alert key={v} severity="error">
+          {field}: {v}
+        </Alert>
+      ));
     });
   }
 
@@ -131,4 +127,4 @@ const PostForm = props => {
   );
 };
 
-export default PostForm;
+export default TextForm;

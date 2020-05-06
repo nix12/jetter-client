@@ -25,4 +25,8 @@ const Jets = () => {
   ));
 };
 
+export const getStaticProps = async () => {
+  return { props: {} };
+};
+
 export default Jets;
