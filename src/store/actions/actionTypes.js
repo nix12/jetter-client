@@ -17,14 +17,15 @@ export const JET_START = 'JET_START';
 export const JET_SUCCESS = 'JET_SUCCESS';
 export const JET_FAIL = 'JET_FAIL';
 
-export const TEXT_START = 'TEXT_START';
-export const TEXT_SUCCESS = 'TEXT_SUCCESS';
-export const TEXT_FAIL = 'TEXT_FAIL';
-
-export const LINK_START = 'LINK_START';
-export const LINK_SUCCESS = 'LINK_SUCCESS';
-export const LINK_FAIL = 'LINK_FAIL';
+export const POST_START = 'POST_START';
+export const POST_SUCCESS = 'POST_SUCCESS';
+export const POST_FAIL = 'POST_FAIL';
 
 export const COMMENT_START = 'COMMENT_START';
 export const COMMENT_SUCCESS = 'COMMENT_SUCCESS';
 export const COMMENT_FAIL = 'COMMENT_FAIL';
+
+export const UPDATE_UPVOTED = 'UPDATE_UPVOTED';
+export const UPDATE_DOWNVOTED = 'UPDATE_DOWNVOTED';
+
+export const SAVED_POSTS = 'SAVED_POSTS';

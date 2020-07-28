@@ -10,7 +10,7 @@ const Jets = () => {
     const fetchJets = async () => {
       const jets = await axios.get('/api/jets');
 
-      setJets(jets.data);
+      setJets(jets.data.jets);
     };
 
     fetchJets();

@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
-import Button from '../../../../../components/UI/Button/Button';
-import Input from '../../../../../components/UI/Input/Input';
+import Button from '../../../../components/UI/Button/Button';
+import Input from '../../../../components/UI/Input/Input';
 
-import { updateObject, checkValidity } from '../../../../../shared/utility';
-import { updateText } from '../../../../../store/actions/index';
+import { updateObject, checkValidity } from '../../../../shared/utility';
+import { updatePost } from '../../../../store/actions/index';
 
-import axios from '../../../../../services/axios/axios-forum';
+import axios from '../../../../services/axios/axios-forum';
 
-const editText = props => {
+const EditPost = props => {
   const { error } = props;
 
   const [form, setForm] = useState({
@@ -29,8 +29,8 @@ const editText = props => {
         valid: false,
         touched: false
       },
-      body: {
-        elementType: 'textarea',
+      uri: {
+        elementType: 'input',
         elementConfig: {
           type: 'text',
           placeholder: 'Body',
@@ -52,9 +52,9 @@ const editText = props => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchText = async () => {
-      const { jetId, textId } = router.query;
-      const textData = await axios.get(`/api/jets/${jetId}/texts/${textId}`);
+    const fetchPost = async () => {
+      const { jetId, linkId } = router.query;
+      const postData = await axios.get(`/api/jets/${jetId}/links/${linkId}`);
 
       setForm(prevState => ({
         ...prevState,
@@ -62,17 +62,17 @@ const editText = props => {
           ...prevState.controls,
           title: {
             ...prevState.title,
-            value: textData.data.text.title
+            value: postData.data.link.title
           },
-          body: {
+          uri: {
             ...prevState.body,
-            value: textData.data.text.body
+            value: postData.data.link.uri
           }
         }
       }));
     };
 
-    fetchText();
+    fetchPost();
   }, []);
 
   const inputChangedHandler = (event, controlName) => {
@@ -93,18 +93,18 @@ const editText = props => {
   const submitHandler = event => {
     event.preventDefault();
 
-    const { jetId, textId } = router.query;
+    const { jetId, linkId } = router.query;
 
     dispatch(
-      updateText(
+      updatePost(
         form.controls.title.value,
         form.controls.body.value,
         jetId,
-        textId
+        linkId
       )
     ).then(response => {
       if (response.status === 204) {
-        router.push('/j/[jetId]/text/[textId]', `/j/${jetId}/text/${textId}`);
+        router.push('/j/[jetId]/link/[linkId]', `/j/${jetId}/link/${linkId}`);
       }
     });
   };
@@ -150,7 +150,7 @@ const editText = props => {
 
   return (
     <div>
-      <h1>New Text</h1>
+      <h1>Edit Post</h1>
 
       <div>
         {errorMessage}
@@ -163,4 +163,4 @@ const editText = props => {
   );
 };
 
-export default editText;
+export default EditPost;

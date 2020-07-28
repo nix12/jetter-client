@@ -1,23 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
 
+import Alert from '@material-ui/lab/Alert';
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
-import LinkUI from '../../../../../components/UI/Link/Link';
-import Comment from '../../../../../components/UI/Comment/Comment';
-import CommentForm from '../../../../../components/Forms/Comment';
+import Post from '../../../../components/UI/Post/Post';
+import Comment from '../../../../components/UI/Comment/Comment';
+import CommentForm from '../../../../components/Forms/Comment';
 
-import axios from '../../../../../services/axios/axios-forum';
+import axios from '../../../../services/axios/axios-forum';
 
 const Show = props => {
-  const { linkData } = props;
+  const { postData } = props;
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(linkData);
-  const [updateLink, setUpdateLink] = useState(false);
+  const [data, setData] = useState(postData);
+  const [updatePost, setUpdatePost] = useState(false);
   const [updateComment, setUpdateComment] = useState(false);
   const [toggleReply, setToggleReply] = useState(true);
   const router = useRouter();
-  const { jetId, linkId } = router.query;
+  const { jetId, type, postId } = router.query;
   let comments;
 
   const renderComment = comment => {
@@ -34,6 +36,7 @@ const Show = props => {
         username={child.voter_id}
         score={child.cached_votes_score}
         nestedComments={renderComment(child.children)}
+        depth={child.ancestry_depth}
         setUpdateComment={setUpdateComment}
       />
     ));
@@ -60,11 +63,11 @@ const Show = props => {
   //   const [current, updateCurrent] = useState([]);
 
   useEffect(() => {
-    const fetchLink = async () => {
-      const linkData = await axios.get(`/api/jets/${jetId}/links/${linkId}`);
+    const fetchPost = async () => {
+      const postData = await axios.get(`/api/jets/${jetId}/${type}s/${postId}`);
 
       // updateCurrent(postData.data);
-      setData(linkData.data);
+      setData(postData.data);
       if (updateComment) {
         setUpdateComment(false);
       }
@@ -74,28 +77,49 @@ const Show = props => {
     //   setData(current);
     // }
 
-    fetchLink();
+    fetchPost();
     setLoading(false);
-  }, [updateComment, updateLink, linkId]);
+  }, [updateComment, updatePost, postId]);
   // };
 
   // useDeepComparison(postData);
+
+  const parentId = useSelector(state => state.comment.parentId);
+  const error = useSelector(state => state.comment.error);
+  let errorMessage = null;
+  if (error && !parentId) {
+    errorMessage = Object.entries(error).map(([key, value]) => {
+      const field = key.charAt(0).toUpperCase() + key.slice(1);
+
+      return value.map(v => (
+        <Alert key={v} severity="error">
+          {field}: {v}
+        </Alert>
+      ));
+    });
+  }
+
   return (
     <div>
-      <LinkUI
-        link={{ __type: 'Link', ...data.link }}
-        body={data.link.body}
-        comments={data.link.comments_count}
-        createdAt={data.link.created_at}
-        jetId={data.link.jet_id}
-        linkId={data.link.hash_id}
-        title={data.link.title}
-        uri={data.link.uri}
-        updatedAt={data.link.updated_at}
-        username={data.link.voter_id}
-        score={data.link.cached_votes_score}
-        setUpdatePost={setUpdateLink}
+      <Post
+        post={{
+          __type: data.post.type === 'Post' ? 'Link' : 'Text',
+          ...data.post
+        }}
+        type={data.post.type.toLowerCase()}
+        body={data.post.body}
+        comments={data.post.comments_count}
+        createdAt={data.post.created_at}
+        jetId={data.post.jet_id}
+        postId={data.post.hash_id}
+        title={data.post.title}
+        uri={data.post.uri}
+        updatedAt={data.post.updated_at}
+        username={data.post.voter_id}
+        score={data.post.cached_votes_score}
+        setUpdatePost={setUpdatePost}
       />
+      {errorMessage}
       <CommentForm
         rows="15"
         cols="65"
@@ -109,12 +133,12 @@ const Show = props => {
 };
 
 Show.getInitialProps = async ({ query }) => {
-  const { jetId, linkId } = query;
-  const url = `/api/jets/${jetId}/links/${linkId}`;
+  const { jetId, type, postId } = query;
+  const url = `/api/jets/${jetId}/${type}s/${postId}`;
 
-  const link = await axios.get(url);
+  const post = await axios.get(url);
 
-  return { linkData: link.data };
+  return { postData: post.data };
 };
 
 export default Show;

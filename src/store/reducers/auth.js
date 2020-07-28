@@ -7,18 +7,16 @@ const initialState = {
     userId: null,
     username: null,
     roles: [],
-    rules: [],
-    loading: false,
-    error: null
-  }
+    rules: []
+  },
+  loading: false,
+  error: null
 };
 
 export const authStart = (state, action) => {
   return updateObject(state, {
-    currentUser: {
-      error: null,
-      loading: true
-    }
+    error: null,
+    loading: true
   });
 };
 

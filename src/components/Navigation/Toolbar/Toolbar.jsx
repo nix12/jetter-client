@@ -222,7 +222,8 @@ const toolbar = props => {
               </Link>
             </div>
             <div className={classes.sectionDesktop}>
-              {loggedIn ? loggedInNav : loggedOutNav}
+              {/* {loggedIn ? loggedInNav : loggedOutNav} */}
+              {loggedIn ? loggedInMobileNav : loggedOutNav}
             </div>
             <div className={classes.sectionMobile}>
               {loggedIn ? loggedInMobileNav : loggedOutNav}

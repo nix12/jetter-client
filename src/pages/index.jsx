@@ -2,48 +2,32 @@ import React, { useState, useEffect, useRef } from 'react';
 import _ from 'lodash';
 import axios from '../services/axios/axios-forum';
 
-import Text from '../components/UI/Text/Text';
-import LinkUI from '../components/UI/Link/Link';
+import Post from '../components/UI/Post/Post';
 
 const all = props => {
   const { allData } = props;
 
   const [data, setData] = useState(allData);
-  const [updateText, setUpdateText] = useState(false);
+  const [updatePost, setUpdatePost] = useState(false);
 
-  const posts = data.map(post =>
-    post.uri ? (
-      <LinkUI
-        key={post.hash_id}
-        link={{ __type: 'Link', ...post }}
-        comments={post.comments_count}
-        createdAt={post.created_at}
-        jetId={post.jet_id}
-        linkId={post.hash_id}
-        title={post.title}
-        uri={post.uri}
-        updatedAt={post.updated_at}
-        username={post.voter_id}
-        score={post.cached_votes_score}
-        setUpdateText={setUpdateText}
-      />
-    ) : (
-      <Text
-        key={post.hash_id}
-        text={{ ...post, __type: 'Text' }}
-        comments={post.comments_count}
-        createdAt={post.created_at}
-        jetId={post.jet_id}
-        textId={post.hash_id}
-        title={post.title}
-        uri={post.uri}
-        updatedAt={post.updated_at}
-        username={post.voter_id}
-        score={post.cached_votes_score}
-        setUpdateText={setUpdateText}
-      />
-    )
-  );
+  const posts = data.posts.map(post => (
+    <Post
+      key={post.hash_id}
+      post={{ __type: post.type === 'Link' ? 'Link' : 'Text', ...post }}
+      type={post.type.toLowerCase()}
+      comments={post.comments_count}
+      createdAt={post.created_at}
+      jetId={post.jet_id}
+      postId={post.hash_id}
+      title={post.title}
+      body={post.body}
+      uri={post.uri}
+      updatedAt={post.updated_at}
+      username={post.voter_id}
+      score={post.cached_votes_score}
+      setUpdatePost={setUpdatePost}
+    />
+  ));
 
   const usePrevious = value => {
     const ref = useRef();
@@ -59,12 +43,12 @@ const all = props => {
 
     useEffect(() => {
       const fetchAll = async () => {
-        const allTexts = await axios.get('/api/all');
+        const allPosts = await axios.get('/api/all');
 
-        updateCurrent(allTexts.data);
+        updateCurrent(allPosts.data);
 
-        if (updateText) {
-          setUpdateText(false);
+        if (updatePost) {
+          setUpdatePost(false);
         }
       };
 
@@ -73,19 +57,19 @@ const all = props => {
       }
 
       fetchAll();
-    }, [updateText]);
+    }, [updatePost]);
   };
 
   useDeepComparison(allData);
 
-  return data.length > 0 ? posts : <p>No posts found.</p>;
+  return data.posts.length > 0 ? posts : <p>No posts found.</p>;
 };
 
 all.getInitialProps = async () => {
   const url = '/api/all';
-  const allTexts = await axios.get(url);
+  const allPosts = await axios.get(url);
 
-  return { allData: allTexts.data };
+  return { allData: allPosts.data };
 };
 
 export default all;

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 
+import FormControl from '@material-ui/core/FormControl';
 import { Alert } from '@material-ui/lab';
 import Input from '../components/UI/Input/Input';
 import Button from '../components/UI/Button/Button';
@@ -144,7 +145,10 @@ const Signup = () => {
       <h1>Sign Up</h1>
       <div>
         {errorMessage}
-        <form onSubmit={submitHandler}>
+        <form
+          style={{ display: 'flex', flexDirection: 'column' }}
+          onSubmit={submitHandler}
+        >
           {outputForm}
           <Button type="submit">Submit</Button>
         </form>

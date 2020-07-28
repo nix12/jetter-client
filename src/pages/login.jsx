@@ -6,7 +6,7 @@ import CircularProgress from '@material-ui/core/CircularProgress/CircularProgres
 import { Alert } from '@material-ui/lab';
 import Input from '../components/UI/Input/Input';
 import Button from '../components/UI/Button/Button';
-import { ability } from '../services/casl/ability';
+
 import { updateObject, checkValidity } from '../shared/utility';
 import { auth } from '../store/actions/index';
 
@@ -37,7 +37,8 @@ const Login = () => {
         value: '',
         validation: {
           required: true,
-          minLength: 8
+          minLength: 8,
+          maxLength: 100
         },
         valid: false,
         touched: false
@@ -45,9 +46,6 @@ const Login = () => {
     }
   });
 
-  const username = useSelector(state => state.auth.currentUser.username);
-  const userId = useSelector(state => state.auth.currentUser.userId);
-  const roles = useSelector(state => state.auth.currentUser.roles);
   const error = useSelector(state => state.auth.error);
   const loading = useSelector(state => state.auth.loading);
 
@@ -75,8 +73,6 @@ const Login = () => {
     ).then(response => {
       if (response.status === 200) {
         router.push('/');
-      } else {
-        router.reload();
       }
     });
   };
@@ -111,35 +107,18 @@ const Login = () => {
     errorMessage = <Alert severity="error">{error}</Alert>;
   }
 
-  const rolesList = roles
-    ? roles.map((role, index) => (
-        <span key={index} style={{ display: 'block' }}>
-          role {role}
-        </span>
-      ))
-    : null;
-
-  const abilities = ability.rules.map((rule, index) => (
-    <span key={index} style={{ display: 'block' }}>
-      rules [{rule.actions}: {rule.subject}]
-    </span>
-  ));
-
   return (
     <div>
       <h2>Login</h2>
       <div>
         {errorMessage}
-        <form onSubmit={submitHandler}>
+        <form
+          style={{ display: 'flex', flexDirection: 'column' }}
+          onSubmit={submitHandler}
+        >
           {formOutput}
           <Button type="submit">Submit</Button>
         </form>
-      </div>
-      <div>
-        <span style={{ display: 'block' }}>ID: {userId}</span>
-        <span style={{ display: 'block' }}>Username: {username}</span>
-        <span style={{ display: 'block' }}>{rolesList}</span>
-        {abilities}
       </div>
     </div>
   );

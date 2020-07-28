@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 import { makeStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
 import Button from '@material-ui/core/Button';
+import Divider from '@material-ui/core/Divider';
 import axios from '../../../services/axios/axios-forum';
 
 const useStyles = makeStyles({
@@ -11,38 +13,41 @@ const useStyles = makeStyles({
   }
 });
 
-const JetList = props => {
+const Trending = props => {
   const { setLoading } = props;
   const classes = useStyles();
   const [list, setList] = useState([]);
 
   useEffect(() => {
-    const fetchJetList = async () => {
+    const fetchTrending = async () => {
       const jets = await axios.get('/api/jets');
 
-      setList(jets.data);
+      setList(jets.data.jets);
     };
 
-    fetchJetList();
+    fetchTrending();
     setLoading(false);
   }, []);
 
   const jets = list.map((text, index) => {
-    const separator = index <= 6 ? <span>|</span> : null;
-
-    while (index <= 8) {
+    while (index <= 5) {
       return (
         <div key={text.id} className={classes.center}>
           <Link href="/j/[jetId]" as={`/j/${text.name}`}>
             <Button>{text.name}</Button>
           </Link>
-          {separator}
         </div>
       );
     }
   });
 
-  return jets;
+  return (
+    <Card>
+      <h4 className={classes.center}>Trending</h4>
+      <Divider />
+      {jets}
+    </Card>
+  );
 };
 
-export default JetList;
+export default Trending;

@@ -3,8 +3,7 @@ import { useRouter } from 'next/router';
 import _ from 'lodash';
 
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
-import Text from '../../../components/UI/Text/Text';
-import LinkUI from '../../../components/UI/Link/Link';
+import Post from '../../../components/UI/Post/Post';
 
 import axios from '../../../services/axios/axios-forum';
 
@@ -12,7 +11,7 @@ const Jet = props => {
   const { jetData } = props;
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(jetData);
-  const [updateText, setUpdateText] = useState(false);
+  const [updatePost, setUpdatePost] = useState(false);
   const router = useRouter();
   const { jetId } = router.query;
   let posts;
@@ -20,41 +19,24 @@ const Jet = props => {
   if (loading) {
     posts = <CircularProgress />;
   } else if (!_.isEmpty(data)) {
-    posts = data.map(post =>
-      post.uri ? (
-        <LinkUI
-          key={post.hash_id}
-          link={{ __type: 'Link', ...post }}
-          comments={post.comments_count}
-          createdAt={post.created_at}
-          linkId={post.hash_id}
-          jetId={post.jet_id}
-          title={post.title}
-          body={post.body}
-          uri={post.uri}
-          updatedAt={post.updated_at}
-          username={post.voter_id}
-          score={post.cached_votes_score}
-          setUpdateText={setUpdateText}
-        />
-      ) : (
-        <Text
-          key={post.hash_id}
-          text={{ __type: 'Text', ...post }}
-          comments={post.comments_count}
-          createdAt={post.created_at}
-          textId={post.hash_id}
-          jetId={post.jet_id}
-          title={post.title}
-          body={post.body}
-          uri={post.uri}
-          updatedAt={post.updated_at}
-          username={post.voter_id}
-          score={post.cached_votes_score}
-          setUpdateText={setUpdateText}
-        />
-      )
-    );
+    posts = data.posts.map(post => (
+      <Post
+        key={post.hash_id}
+        post={{ __type: post.type === 'Link' ? 'Link' : 'Text', ...post }}
+        type={post.type.toLowerCase()}
+        comments={post.comments_count}
+        createdAt={post.created_at}
+        postId={post.hash_id}
+        jetId={post.jet_id}
+        title={post.title}
+        uri={post.uri}
+        body={post.body}
+        updatedAt={post.updated_at}
+        username={post.voter_id}
+        score={post.cached_votes_score}
+        setUpdatePost={setUpdatePost}
+      />
+    ));
   } else {
     posts = <p>No posts found.</p>;
   }
@@ -73,13 +55,13 @@ const Jet = props => {
 
     useEffect(() => {
       const fetchJet = async () => {
-        const jetTexts = await axios.get(`/api/jets/${jetId}`);
+        const jetPosts = await axios.get(`/api/jets/${jetId}`);
 
-        updateCurrent(jetTexts.data);
-        setData(jetTexts.data);
+        updateCurrent(jetPosts.data);
+        setData(jetPosts.data);
 
-        if (updateText) {
-          setUpdateText(false);
+        if (updatePost) {
+          setUpdatePost(false);
         }
       };
 
@@ -89,7 +71,7 @@ const Jet = props => {
 
       fetchJet();
       setLoading(false);
-    }, [updateText, jetId]);
+    }, [updatePost, jetId]);
   };
 
   useDeepComparison(jetData);
@@ -100,9 +82,9 @@ const Jet = props => {
 Jet.getInitialProps = async ({ query }) => {
   const { jetId } = query;
   const url = `/api/jets/${jetId}`;
-  const jetTexts = await axios.get(url);
+  const jetPosts = await axios.get(url);
 
-  return { jetData: jetTexts.data };
+  return { jetData: jetPosts.data };
 };
 
 export default Jet;

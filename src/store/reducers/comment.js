@@ -2,6 +2,7 @@ import * as actionTypes from '../actions/actionTypes';
 import { updateObject } from '../../shared/utility';
 
 const initialState = {
+  parentId: '',
   error: null,
   loading: false
 };
@@ -22,6 +23,7 @@ export const commentSuccess = (state, action) => {
 
 export const commentFail = (state, action) => {
   return updateObject(state, {
+    parentId: action.parentId,
     error: action.error,
     loading: false
   });

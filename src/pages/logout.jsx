@@ -8,13 +8,7 @@ const Logout = () => {
   const router = useRouter();
 
   useEffect(() => {
-    dispatch(logout())
-      .then(response => {
-        if (response.status === 200) {
-          router.push('/login');
-        }
-      })
-      .catch(router.reload());
+    dispatch(logout()).then(() => router.push('/'));
   }, []);
 
   return null;

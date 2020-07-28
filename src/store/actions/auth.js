@@ -72,7 +72,7 @@ export const logout = () => dispatch => {
       .then(response => {
         removeCookie();
         ability.update([]);
-        dispatch(authLogout());
+        // dispatch(authLogout());
 
         return response;
       })
@@ -80,6 +80,7 @@ export const logout = () => dispatch => {
         const error = 'Error: Failed to logout.';
 
         dispatch(authFail(error));
+        return err.response;
       });
   }
 
@@ -122,6 +123,8 @@ export const auth = (username, password) => (dispatch, getState) => {
           data.user.rules
         )
       );
+
+      return response;
     })
     .catch(err => {
       if (err.response.status === 400 || err.response.status === 401) {
@@ -133,6 +136,8 @@ export const auth = (username, password) => (dispatch, getState) => {
 
         dispatch(authFail(error));
       }
+
+      return err.response;
     });
 };
 
@@ -153,7 +158,7 @@ export const authCheckState = () => dispatch => {
 
       dispatch(
         authSuccess(
-          data.user.userId,
+          data.user.id,
           data.user.username,
           data.user.roles,
           data.user.rules

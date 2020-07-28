@@ -7,12 +7,13 @@ import Button from '../UI/Button/Button';
 import Input from '../UI/Input/Input';
 
 import { updateObject, checkValidity } from '../../shared/utility';
-import { createLink } from '../../store/actions/index';
+import { createPost } from '../../store/actions/index';
 
 const LinkForm = props => {
   const { value, index } = props;
 
   const [form, setForm] = useState({
+    formType: 'link',
     controls: {
       title: {
         elementType: 'input',
@@ -57,7 +58,7 @@ const LinkForm = props => {
       })
     });
 
-    setForm({ controls: updatedControls });
+    setForm({ ...form, controls: updatedControls });
   };
 
   const router = useRouter();
@@ -68,10 +69,16 @@ const LinkForm = props => {
     const { jetId } = router.query;
 
     dispatch(
-      createLink(form.controls.title.value, form.controls.uri.value, jetId)
+      createPost(
+        form.controls.title.value,
+        null,
+        form.controls.uri.value,
+        form.formType,
+        jetId
+      )
     ).then(response => {
       if (response.status === 201) {
-        router.push('/j/[jetId]', `/j/${jetId}`);
+        router.replace(`/j/${jetId}/link/${response.data.post.hash_id}`);
       }
     });
   };
@@ -98,7 +105,7 @@ const LinkForm = props => {
     />
   ));
 
-  const error = useSelector(state => state.link.error);
+  const error = useSelector(state => state.post.error);
   let errorMessage = null;
   if (error) {
     errorMessage = Object.entries(error).map(([key, value]) => {

@@ -15,8 +15,7 @@ import authReducer from '../store/reducers/auth';
 import registerReducer from '../store/reducers/register';
 import userReducer from '../store/reducers/user';
 import jetReducer from '../store/reducers/jet';
-import textReducer from '../store/reducers/text';
-import linkReducer from '../store/reducers/link';
+import postReducer from '../store/reducers/post';
 import commentReducer from '../store/reducers/comment';
 
 import Layout from '../containers/Layout/Layout';
@@ -26,8 +25,7 @@ const rootReducer = combineReducers({
   register: registerReducer,
   user: userReducer,
   jet: jetReducer,
-  text: textReducer,
-  link: linkReducer,
+  post: postReducer,
   comment: commentReducer
 });
 
@@ -53,6 +51,7 @@ class MyApp extends App {
 
   render() {
     const { Component, pageProps, store } = this.props;
+
     return (
       <Provider store={store}>
         <Head>

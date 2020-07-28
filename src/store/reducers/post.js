@@ -6,21 +6,21 @@ const initialState = {
   loading: false
 };
 
-export const linkStart = (state, action) => {
+export const postStart = (state, action) => {
   return updateObject(state, {
     error: null,
     loading: true
   });
 };
 
-export const linkSuccess = (state, action) => {
+export const postSuccess = (state, action) => {
   return updateObject(state, {
     error: null,
     loading: false
   });
 };
 
-export const linkFail = (state, action) => {
+export const postFail = (state, action) => {
   return updateObject(state, {
     error: action.error,
     loading: false
@@ -29,12 +29,12 @@ export const linkFail = (state, action) => {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.LINK_START:
-      return linkStart(state, action);
-    case actionTypes.LINK_SUCCESS:
-      return linkSuccess(state, action);
-    case actionTypes.LINK_FAIL:
-      return linkFail(state, action);
+    case actionTypes.POST_START:
+      return postStart(state, action);
+    case actionTypes.POST_SUCCESS:
+      return postSuccess(state, action);
+    case actionTypes.POST_FAIL:
+      return postFail(state, action);
     default:
       return state;
   }

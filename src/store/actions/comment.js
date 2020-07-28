@@ -1,9 +1,10 @@
 import * as actionTypes from './actionTypes';
 import axios from '../../services/axios/axios-forum';
 
-export const commentFail = error => {
+export const commentFail = (parentId, error) => {
   return {
     type: actionTypes.COMMENT_FAIL,
+    parentId,
     error
   };
 };
@@ -35,7 +36,7 @@ export const createComment = (
   return axios
     .post(uri, commentData)
     .then(response => response)
-    .catch(err => dispatch(commentFail(err.response.data.errors)));
+    .catch(err => dispatch(commentFail(parentId, err.response.data.errors)));
 };
 
 export const updateComment = (

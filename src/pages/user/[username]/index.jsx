@@ -1,31 +1,46 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import Cookies from 'universal-cookie';
 
-import Can from '../../../components/Permissions/Can';
+import Select from '@material-ui/core/Select/Select';
+import MenuItem from '@material-ui/core/MenuItem/MenuItem';
+import Profile from '../../../containers/User/Profile';
+import PostHistory from '../../../containers/User/PostHistory';
+import SavedPosts from '../../../containers/User/SavedPosts';
+
 import redirectTo from '../../../shared/redirectTo';
 
 const User = () => {
-  const user = useSelector(state => state.auth.currentUser);
+  const [value, setValue] = useState('Profile');
+
+  const userId = useSelector(state => state.auth.currentUser.userId);
+  const username = useSelector(state => state.auth.currentUser.username);
+
+  const handleChange = event => {
+    event.preventDefault();
+    setValue(event.target.value);
+  };
 
   return (
     <div>
-      <h1>My Profile</h1>
-
-      <Can I="read" this={{ __type: 'User', id: user.userId }}>
-        <h1>{user.userId}</h1>
-        <h1>{`${user.username}'s Page`}</h1>
-      </Can>
+      <Select defaultValue="Profile" value={value} onChange={handleChange}>
+        <MenuItem value="Profile">Profile</MenuItem>
+        <MenuItem value="Post History">Post History</MenuItem>
+        <MenuItem value="Saved Posts">Saved Posts</MenuItem>
+      </Select>
+      <Profile value={value} index="Profile" />
+      <PostHistory value={value} index="Post History" />
+      <SavedPosts value={value} index="Saved Posts" />
     </div>
   );
 };
 
-User.getInitialProps = async ({ res }) => {
+User.getInitialProps = async ({ res, isServer }) => {
   const cookies = new Cookies();
   const token = cookies.get('token');
 
-  if (!token) {
-    redirectTo('/login', { res, status: 301 });
+  if (!token && !isServer) {
+    redirectTo('/login');
   }
 
   return {};

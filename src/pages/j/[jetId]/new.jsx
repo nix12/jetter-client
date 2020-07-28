@@ -18,6 +18,7 @@ const NewText = props => {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
   return (
     <div>
       <Tabs variant="fullWidth" value={value} onChange={handleChange}>

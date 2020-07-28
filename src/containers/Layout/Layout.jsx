@@ -6,14 +6,21 @@ import _ from 'lodash';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-// import { Alert } from '@material-ui/lab';
+import Grid from '@material-ui/core/Grid';
+import { Alert } from '@material-ui/lab';
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
 import Button from '@material-ui/core/Button';
 
 import Toolbar from '../../components/Navigation/Toolbar/Toolbar';
-import JetList from '../../components/UI/JetList/JetList';
+import DefaultJets from '../../components/Navigation/DefaultJets/DefaultJets';
+import Trending from '../../components/Navigation/Trending/Trending';
 import LoggedIn from '../../components/Permissions/LoggedIn';
-import { authCheckState } from '../../store/actions/index';
+import {
+  authCheckState,
+  getUpvoted,
+  getDownvoted,
+  getSavedPosts
+} from '../../store/actions/index';
 
 const useStyles = makeStyles({
   buttons: {
@@ -35,40 +42,70 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center'
+  },
+  trending: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });
 
 const Layout = props => {
   const { children } = props;
+
   const classes = useStyles();
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const dispatch = useDispatch();
+
+  const [loading, setLoading] = useState(true);
+
   const username = useSelector(state => state.auth.currentUser.username);
   const isLoggedIn = useSelector(state => state.auth.currentUser.isLoggedIn);
-  // const error = useSelector(state => state.auth.error);
+  const error = useSelector(state => state.auth.error);
+
   const { jetId } = router.query;
 
   useEffect(() => setLoading(false), [loading]);
   useEffect(() => dispatch(authCheckState()), []);
 
-  // let errorMessage = null;
-  // if (error) {
-  //   errorMessage = <Alert severity="error">{error}</Alert>;
-  // }
+  useEffect(() => {
+    if (username) {
+      dispatch(getUpvoted(username));
+    }
+  }, [username]);
+
+  useEffect(() => {
+    if (username) {
+      dispatch(getDownvoted(username));
+    }
+  }, [username]);
+
+  useEffect(() => {
+    if (username) {
+      dispatch(getSavedPosts(username));
+    }
+  }, [username]);
+
+  let errorMessage = null;
+  if (error) {
+    errorMessage = <Alert severity="error">{error}</Alert>;
+  }
 
   return (
     <div>
       <Toolbar user={username} loggedIn={isLoggedIn} />
       <h3 style={{ textAlign: 'center' }}>UNDER CONSTRUCTION</h3>
-      {/* {errorMessage} */}
       <div className={classes.jets}>
-        {loading ? <CircularProgress /> : <JetList setLoading={setLoading} />}
+        <DefaultJets />
       </div>
+      {errorMessage}
       <Container className={classes.layout}>
-        <div>{children}</div>
-        <LoggedIn>
-          <div className={classes.buttons}>
+        <Grid lg={8} item>
+          {children}
+        </Grid>
+        <Grid lg={2} item className={classes.buttons}>
+          <LoggedIn>
             <Link href="/j/new">
               <Button color="primary" variant="contained">
                 Create Jet
@@ -81,8 +118,15 @@ const Layout = props => {
                 </Button>
               </Link>
             ) : null}
-          </div>
-        </LoggedIn>
+          </LoggedIn>
+          <Grid>
+            {loading ? (
+              <CircularProgress />
+            ) : (
+              <Trending setLoading={setLoading} />
+            )}
+          </Grid>
+        </Grid>
       </Container>
     </div>
   );

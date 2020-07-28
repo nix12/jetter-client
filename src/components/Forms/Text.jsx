@@ -7,12 +7,13 @@ import Button from '../UI/Button/Button';
 import Input from '../UI/Input/Input';
 
 import { updateObject, checkValidity } from '../../shared/utility';
-import { createText } from '../../store/actions/index';
+import { createPost } from '../../store/actions/index';
 
 const TextForm = props => {
   const { value, index } = props;
 
   const [form, setForm] = useState({
+    formType: 'text',
     controls: {
       title: {
         elementType: 'input',
@@ -59,7 +60,7 @@ const TextForm = props => {
       })
     });
 
-    setForm({ controls: updatedControls });
+    setForm({ ...form, controls: updatedControls });
   };
 
   const router = useRouter();
@@ -70,10 +71,16 @@ const TextForm = props => {
     const { jetId } = router.query;
 
     dispatch(
-      createText(form.controls.title.value, form.controls.body.value, jetId)
+      createPost(
+        form.controls.title.value,
+        form.controls.body.value,
+        null,
+        form.formType,
+        jetId
+      )
     ).then(response => {
       if (response.status === 201) {
-        router.reload();
+        router.replace(`/j/${jetId}/text/${response.data.post.hash_id}`);
       }
     });
   };
@@ -100,7 +107,7 @@ const TextForm = props => {
     />
   ));
 
-  const error = useSelector(state => state.text.error);
+  const error = useSelector(state => state.post.error);
   let errorMessage = null;
   if (error) {
     errorMessage = Object.entries(error).map(([key, value]) => {

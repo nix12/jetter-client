@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Moment from 'moment';
 import Cookies from 'universal-cookie';
 import jwtDecode from 'jwt-decode';
+import _ from 'lodash';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -16,6 +17,7 @@ import ArrowDown from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
 
 import CommentForm from '../../Forms/Comment';
+import RedirectToLogin from '../../Permissions/RedirectToLogin';
 import Button from '../Button/Button';
 import axios from '../../../services/axios/axios-forum';
 import Can from '../../Permissions/Can';
@@ -50,6 +52,10 @@ const useStyles = makeStyles({
       cursor: 'pointer',
       textDecoration: 'underline'
     }
+  },
+  indentComments: {
+    marginLeft: props => `${props.depth * 25}px`,
+    marginTop: '10px'
   }
 });
 
@@ -64,8 +70,10 @@ const Comment = props => {
     linkId,
     commentId,
     body,
+    depth,
     setUpdateComment,
-    nestedComments
+    nestedComments,
+    style
   } = props;
 
   const upvote = (jet, text, comment) =>
@@ -74,15 +82,18 @@ const Comment = props => {
     axios.put(`/api/jets/${jet}/texts/${text}/comments/${comment}/downvote`);
   const unvote = (jet, text, comment) =>
     axios.put(`/api/jets/${jet}/texts/${text}/comments/${comment}/unvote`);
+
   const [toggleReply, setToggleReply] = useState(false);
   const [up, setUpvote] = useState(false);
   const [down, setDownvote] = useState(false);
-
   const [toggleEdit, setToggleEdit] = useState(false);
 
   const isLoggedIn = useSelector(state => state.auth.currentUser.isLoggedIn);
 
-  const classes = useStyles();
+  const classes = useStyles({ depth });
+  const dispatch = useDispatch();
+  const router = useRouter();
+
   const now = new Moment();
   const created = new Moment(createdAt);
   const duration = Moment.duration(created.diff(now)).humanize();
@@ -92,6 +103,9 @@ const Comment = props => {
   if (token) {
     userInfo = jwtDecode(token);
   }
+
+  const upvotedList = useSelector(state => state.user.voter.votes.upvoted);
+  const downvotedList = useSelector(state => state.user.voter.votes.downvoted);
 
   const upvoted = async (jet, text, comment) => {
     if (up) {
@@ -130,8 +144,6 @@ const Comment = props => {
     setUpdateComment(true);
   };
 
-  const dispatch = useDispatch();
-  const router = useRouter();
   const removeComment = () => {
     dispatch(deleteComment(jetId, textId, linkId, commentId)).then(response => {
       if (response.status === 204) {
@@ -140,27 +152,40 @@ const Comment = props => {
     });
   };
 
+  const checkVoted = list => {
+    return _.includes(_.map(list, 'hash_id'), commentId);
+  };
+
+  useEffect(() => setUpvote(checkVoted(upvotedList)), [upvotedList]);
+  useEffect(() => setDownvote(checkVoted(downvotedList)), [downvotedList]);
+
+  const saveComment = () => {};
+
   return (
-    <div style={{ marginLeft: '25px', marginTop: '10px' }}>
+    <div className={classes.indentComments}>
       <div>
-        <Card className={classes.card}>
+        <Card className={classes.card} style={style}>
           <div className={classes.votes}>
-            <ArrowUp
-              onClick={
-                !down
-                  ? () => upvoted(jetId, textId, commentId)
-                  : () => switchVote(jetId, textId, commentId)
-              }
-              className={up ? classes.voted : ''}
-            />
-            <ArrowDown
-              onClick={
-                !up
-                  ? () => downvoted(jetId, textId, commentId)
-                  : () => switchVote(jetId, textId, commentId)
-              }
-              className={down ? classes.voted : ''}
-            />
+            <RedirectToLogin>
+              <ArrowUp
+                onClick={
+                  !down
+                    ? () => upvoted(jetId, textId, commentId)
+                    : () => switchVote(jetId, textId, commentId)
+                }
+                className={up ? classes.voted : ''}
+              />
+            </RedirectToLogin>
+            <RedirectToLogin>
+              <ArrowDown
+                onClick={
+                  !up
+                    ? () => downvoted(jetId, textId, commentId)
+                    : () => switchVote(jetId, textId, commentId)
+                }
+                className={down ? classes.voted : ''}
+              />
+            </RedirectToLogin>
           </div>
           {toggleEdit ? (
             <CommentForm
@@ -208,6 +233,11 @@ const Comment = props => {
                 <Can do="delete" on={comment}>
                   <Button size="small" clicked={() => removeComment()}>
                     delete
+                  </Button>
+                </Can>
+                <Can do="create" on={comment}>
+                  <Button size="small" onClick={() => saveComment}>
+                    save
                   </Button>
                 </Can>
               </CardActions>

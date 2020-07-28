@@ -183,32 +183,20 @@ const CommentForm = props => {
     ));
   }
 
-  const [alertPresent, setAlertPresent] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const parentId = useSelector(state => state.comment.parentId);
   const error = useSelector(state => state.comment.error);
-  // let errorMessage = null;
-  useEffect(() => {
-    if (error && alertPresent === false) {
-      console.log('Alert');
+  let errorMessage = null;
+  if (error && parentId === commentId) {
+    errorMessage = Object.entries(error).map(([key, value]) => {
+      const field = key.charAt(0).toUpperCase() + key.slice(1);
 
-      setErrorMessage(
-        Object.entries(error).map(([key, value]) => {
-          const field = key.charAt(0).toUpperCase() + key.slice(1);
-
-          return value.map(v => (
-            <Alert key={v} severity="error">
-              {field}: {v}
-            </Alert>
-          ));
-        })
-      );
-      console.log('[before]', alertPresent);
-      console.log(setAlertPresent(true));
-      console.log('[after]', alertPresent);
-    }
-    console.log('[after]', alertPresent);
-    console.log(errorMessage);
-  }, [alertPresent, errorMessage]);
+      return value.map(v => (
+        <Alert key={v} severity="error">
+          {field}: {v}
+        </Alert>
+      ));
+    });
+  }
 
   return toggle || edit ? (
     <div>
