@@ -87,7 +87,7 @@ export const logout = () => dispatch => {
   dispatch(authLogout());
 };
 
-export const auth = (username, password) => (dispatch, getState) => {
+export const auth = (username, password) => dispatch => {
   dispatch(authStart());
 
   const authData = {
@@ -109,8 +109,10 @@ export const auth = (username, password) => (dispatch, getState) => {
   return axios
     .post(url, authData)
     .then(response => {
+      console.log('[RESPONSE]', response);
       const token = response.data.access_token;
       const data = jwtDecode(token);
+      console.log('[data]', data);
 
       setCookie(token, response.data.expires_in);
       defineRulesFor(data.user);

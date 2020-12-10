@@ -12,8 +12,8 @@ export const commentFail = (parentId, error) => {
 export const createComment = (
   body,
   jetId,
-  textId,
-  linkId,
+  postId,
+  type,
   commentableId,
   commentableType,
   parentId
@@ -21,17 +21,14 @@ export const createComment = (
   const commentData = {
     comment: {
       body,
-      text_id: textId,
-      link_id: linkId,
+      post_id: postId,
       commentable_id: commentableId,
       commentable_type: commentableType,
       parent_id: parentId
     }
   };
 
-  const uri = linkId
-    ? `/api/jets/${jetId}/links/${linkId}/comments`
-    : `/api/jets/${jetId}/texts/${textId}/comments`;
+  const uri = `/api/jets/${jetId}/${type}s/${postId}/comments`;
 
   return axios
     .post(uri, commentData)
@@ -42,8 +39,8 @@ export const createComment = (
 export const updateComment = (
   body,
   jetId,
-  textId,
-  linkId,
+  postId,
+  type,
   commentableId,
   commentableType,
   commentId
@@ -51,16 +48,13 @@ export const updateComment = (
   const commentData = {
     comment: {
       body,
-      text_id: textId,
-      link_id: linkId,
+      post_id: postId,
       commentable_id: commentableId,
       commentable_type: commentableType
     }
   };
 
-  const uri = linkId
-    ? `/api/jets/${jetId}/links/${linkId}/comments/${commentId}`
-    : `/api/jets/${jetId}/texts/${textId}/comments/${commentId}`;
+  const uri = `/api/jets/${jetId}/${type}s/${postId}/comments/${commentId}`;
 
   return axios
     .patch(uri, commentData)
@@ -68,10 +62,8 @@ export const updateComment = (
     .catch(err => dispatch(commentFail(err.response.data.errors)));
 };
 
-export const deleteComment = (jetId, textId, linkId, commentId) => dispatch => {
-  const uri = linkId
-    ? `/api/jets/${jetId}/links/${linkId}/comments/${commentId}`
-    : `/api/jets/${jetId}/texts/${textId}/comments/${commentId}`;
+export const deleteComment = (jetId, postId, type, commentId) => dispatch => {
+  const uri = `/api/jets/${jetId}/${type}s/${postId}/comments/${commentId}`;
 
   return axios
     .delete(uri)

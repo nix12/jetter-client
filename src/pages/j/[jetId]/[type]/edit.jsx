@@ -53,8 +53,8 @@ const EditPost = props => {
 
   useEffect(() => {
     const fetchPost = async () => {
-      const { jetId, linkId } = router.query;
-      const postData = await axios.get(`/api/jets/${jetId}/links/${linkId}`);
+      const { jetId, postId } = router.query;
+      const postData = await axios.get(`/api/jets/${jetId}/links/${postId}`);
 
       setForm(prevState => ({
         ...prevState,
@@ -93,18 +93,18 @@ const EditPost = props => {
   const submitHandler = event => {
     event.preventDefault();
 
-    const { jetId, linkId } = router.query;
+    const { jetId, postId } = router.query;
 
     dispatch(
       updatePost(
         form.controls.title.value,
         form.controls.body.value,
         jetId,
-        linkId
+        postId
       )
     ).then(response => {
       if (response.status === 204) {
-        router.push('/j/[jetId]/link/[linkId]', `/j/${jetId}/link/${linkId}`);
+        router.push('/j/[jetId]/link/[postId]', `/j/${jetId}/link/${postId}`);
       }
     });
   };

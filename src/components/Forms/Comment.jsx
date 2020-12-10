@@ -63,27 +63,23 @@ const CommentForm = props => {
   const submitHandler = event => {
     event.preventDefault();
 
-    const { jetId, textId, linkId } = router.query;
+    const { jetId, postId, type } = router.query;
 
-    let type;
+    let commentableType;
     if (commentId) {
-      type = 'Comment';
+      commentableType = 'Comment';
     } else {
-      if (textId) {
-        type = 'Text';
-      }
-
-      type = 'Link';
+      commentableType = 'Post';
     }
 
     dispatch(
       createComment(
         form.controls.body.value,
         jetId,
-        textId || null,
-        linkId || null,
-        commentId || textId || linkId,
+        postId,
         type,
+        commentId || postId,
+        commentableType,
         commentId || null
       )
     ).then(response => {
@@ -107,27 +103,23 @@ const CommentForm = props => {
   const submitEditHandler = event => {
     event.preventDefault();
 
-    const { jetId, textId, linkId } = router.query;
+    const { jetId, postId, type } = router.query;
 
-    let type;
+    let commentableType;
     if (commentId) {
-      type = 'Comment';
+      commentableType = 'Comment';
     } else {
-      if (textId) {
-        type = 'Text';
-      }
-
-      type = 'Link';
+      commentableType = 'Post';
     }
 
     dispatch(
       updateComment(
         form.controls.body.value,
         jetId,
-        textId || null,
-        linkId || null,
-        commentId || textId || linkId,
+        postId,
         type,
+        commentId || postId,
+        commentableType,
         commentId || null
       )
     ).then(response => {

@@ -66,8 +66,7 @@ const Comment = props => {
     createdAt,
     score,
     jetId,
-    textId,
-    linkId,
+    postId,
     commentId,
     body,
     depth,
@@ -99,6 +98,7 @@ const Comment = props => {
   const duration = Moment.duration(created.diff(now)).humanize();
   const cookies = new Cookies();
   const token = cookies.get('token');
+
   let userInfo;
   if (token) {
     userInfo = jwtDecode(token);
@@ -145,7 +145,7 @@ const Comment = props => {
   };
 
   const removeComment = () => {
-    dispatch(deleteComment(jetId, textId, linkId, commentId)).then(response => {
+    dispatch(deleteComment(jetId, postId, commentId)).then(response => {
       if (response.status === 204) {
         router.reload();
       }
@@ -170,8 +170,8 @@ const Comment = props => {
               <ArrowUp
                 onClick={
                   !down
-                    ? () => upvoted(jetId, textId, commentId)
-                    : () => switchVote(jetId, textId, commentId)
+                    ? () => upvoted(jetId, postId, commentId)
+                    : () => switchVote(jetId, postId, commentId)
                 }
                 className={up ? classes.voted : ''}
               />
@@ -180,8 +180,8 @@ const Comment = props => {
               <ArrowDown
                 onClick={
                   !up
-                    ? () => downvoted(jetId, textId, commentId)
-                    : () => switchVote(jetId, textId, commentId)
+                    ? () => downvoted(jetId, postId, commentId)
+                    : () => switchVote(jetId, postId, commentId)
                 }
                 className={down ? classes.voted : ''}
               />

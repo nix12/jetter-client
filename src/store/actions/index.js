@@ -8,6 +8,7 @@ export {
   getDownvoted,
   save,
   unsave,
+  getSavedPost,
   getSavedPosts
 } from './user';
 

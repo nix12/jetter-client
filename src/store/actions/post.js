@@ -18,7 +18,7 @@ export const createPost = (title, body, uri, formType, jetId) => dispatch => {
     type: field,
     jet_id: jetId
   };
-
+  console.log('formType', formType);
   return axios
     .post(`/api/jets/${jetId}/${formType}s`, postData)
     .then(response => response)

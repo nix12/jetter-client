@@ -10,7 +10,7 @@ const initialState = {
       downvoted: []
     },
     history: [],
-    saved: []
+    savedList: []
   }
 };
 
@@ -38,7 +38,7 @@ export const updateFail = (state, action) => {
 export const updateUpvoted = (state, action) => {
   return updateObject(state, {
     voter: {
-      ...state.votef,
+      ...state.voter,
       votes: {
         ...state.voter.votes,
         upvoted: action.upvoted
@@ -63,7 +63,7 @@ export const savedPosts = (state, action) => {
   return updateObject(state, {
     voter: {
       ...state.voter,
-      saved: action.saved
+      savedList: action.savedList
     }
   });
 };

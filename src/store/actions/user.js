@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import * as actionTypes from './actionTypes';
 import axios from '../../services/axios/axios-user';
 import axiosForum from '../../services/axios/axios-forum';
@@ -83,39 +84,46 @@ export const getDownvoted = username => dispatch => {
 
 // Saving Posts
 
-export const savedPosts = saved => {
+export const savedPosts = savedList => {
   return {
     type: actionTypes.SAVED_POSTS,
-    saved
+    savedList
   };
 };
 
-export const save = (username, postId, commentId) => dispatch => {
+export const save = (username, postId) => dispatch => {
   const url = `/api/voters/${username}/saved_posts`;
 
   const savedData = {
     saved_post: {
       post_id: postId,
-      comment_id: commentId,
       voter_id: username
     }
   };
 
-  return axiosForum.post(url, savedData);
+  return axiosForum.post(url, savedData).then(response => {
+    return response.data.saved_post;
+  })
 };
 
-export const unsave = (username, postId, commentId) => dispatch => {
-  const url = `/api/voters/${username}/saved_posts`;
+export const unsave = (username, saveId) => dispatch => {
+  const url = `/api/voters/${username}/saved_posts/${saveId}`;
+  return axiosForum.delete(url);
+};
+
+export const getSavedPost = (username, postId) => dispatch => {
+  const url = `/api/voters/${username}/saved_posts/${postId}`;
 
   const savedData = {
-    saved_post: {
-      post_id: postId,
-      comment_id: commentId,
-      voter_id: username
+    params: {
+      voter_id: username,
+      post_id: postId
     }
   };
 
-  return axiosForum.delete(url, savedData);
+  return axiosForum
+    .get(url, savedData)
+    .then(response => response.data.saved_post);
 };
 
 export const getSavedPosts = username => dispatch => {
@@ -127,8 +135,9 @@ export const getSavedPosts = username => dispatch => {
     }
   };
 
-  return axiosForum.get(url, savedData).then(response => {
-    console.log('action', response);
-    dispatch(savedPosts(response.data.saved_posts));
-  });
+  return axiosForum
+    .get(url, savedData)
+    .then(response =>
+      dispatch(savedPosts(_.map(response.data.saved_posts, 'id')))
+    );
 };

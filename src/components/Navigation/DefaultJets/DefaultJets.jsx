@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 const DefaultJets = () => {
   return (
     <div>
-      <Link href="/j/[jetId]" as="/j/all">
+      <Link href="/" as="/j/all">
         <Button>all</Button>
       </Link>
       |

@@ -20,7 +20,12 @@ import Divider from '@material-ui/core/Divider';
 import axios from '../../../services/axios/axios-forum';
 import Can from '../../Permissions/Can';
 import RedirectToLogin from '../../Permissions/RedirectToLogin';
-import { deletePost, save, unsave } from '../../../store/actions/index';
+import {
+  deletePost,
+  save,
+  unsave,
+  getSavedPost
+} from '../../../store/actions/index';
 
 const useStyles = makeStyles({
   card: {
@@ -90,11 +95,11 @@ const Post = props => {
 
   const [up, setUpvote] = useState(false);
   const [down, setDownvote] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [savedId, setSavedId] = useState(null);
 
   const upvotedList = useSelector(state => state.user.voter.votes.upvoted);
   const downvotedList = useSelector(state => state.user.voter.votes.downvoted);
-  const savedList = useSelector(state => state.user.voter.saved);
+  const savedList = useSelector(state => state.user.voter.savedList);
 
   const upvoted = async (jet, type, postId) => {
     if (up) {
@@ -145,32 +150,28 @@ const Post = props => {
     return _.includes(_.map(list, 'hash_id'), postId);
   };
 
-  const checkSaved = list => {
-    return _.includes(_.map(list, 'post_id'), postId);
+  const savePost = () => {
+    dispatch(save(username, postId)).then(response => setSavedId(response.id));
+  };
+
+  const unsavePost = saveId => {
+    dispatch(unsave(username, saveId)).then(() => setSavedId(null));
   };
 
   useEffect(() => setUpvote(checkVote(upvotedList)), [upvotedList]);
   useEffect(() => setDownvote(checkVote(downvotedList)), [downvotedList]);
-  useEffect(() => setSaved(checkSaved(savedList)), [savedList]);
 
-  const savePost = () => {
-    dispatch(save(username, postId, null));
-  };
+  useEffect(() => {
+    const toggleSave = async () => {
+      await dispatch(getSavedPost(username, postId)).then(response => {
+        if (response && _.includes(savedList, response.id)) {
+          setSavedId(response.id);
+        }
+      });
+    };
 
-  const unsavePost = () => {
-    dispatch(unsave(username, postId, null));
-  };
-
-  const toggleSave = () => {
-    console.log('toggleSave');
-    if (!saved) {
-      savePost();
-    }
-
-    if (saved) {
-      unsavePost();
-    }
-  };
+    toggleSave();
+  }, [savedId, savedList]);
 
   return (
     <Card className={classes.card} style={style}>
@@ -259,10 +260,17 @@ const Post = props => {
             </Button>
           </Can>
           <Can do="create" on={post}>
-            <Button size="small" onClick={() => toggleSave()}>
-              {saved ? <Star /> : <StarBorder />}
-              &nbsp; save
-            </Button>
+            {savedId ? (
+              <Button size="small" onClick={() => unsavePost(savedId)}>
+                <Star />
+                &nbsp; save
+              </Button>
+            ) : (
+              <Button size="small" onClick={() => savePost()}>
+                <StarBorder />
+                &nbsp; save
+              </Button>
+            )}
           </Can>
         </CardActions>
       </div>
