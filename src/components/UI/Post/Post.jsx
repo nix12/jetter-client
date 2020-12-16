@@ -101,6 +101,7 @@ const Post = props => {
   const upvotedList = useSelector(state => state.user.voter.votes.upvoted);
   const downvotedList = useSelector(state => state.user.voter.votes.downvoted);
   const savedList = useSelector(state => state.user.voter.savedList);
+  const currentUser = useSelector(state => state.auth.currentUser.username);
 
   const upvoted = async (jet, type, postId) => {
     if (up) {
@@ -152,9 +153,15 @@ const Post = props => {
   };
 
   const savePostHandler = () => {
-    dispatch(savePost(username, postId)).then(response =>
-      setSavedId(response.id)
-    );
+    if (currentUser === username) {
+      dispatch(savePost(username, postId)).then(response =>
+        setSavedId(response.id)
+      );
+    } else {
+      dispatch(savePost(currentUser, postId)).then(response =>
+        setSavedId(response.id)
+      );
+    }
   };
 
   const unsavePostHandler = saveId => {
@@ -166,11 +173,19 @@ const Post = props => {
 
   useEffect(() => {
     const toggleSave = async () => {
-      await dispatch(getSavedPost(username, postId)).then(response => {
-        if (response && _.includes(savedList, response.id)) {
-          setSavedId(response.id);
-        }
-      });
+      if (currentUser === username) {
+        await dispatch(getSavedPost(username, postId)).then(response => {
+          if (response && _.includes(savedList, response.id)) {
+            setSavedId(response.id);
+          }
+        });
+      } else {
+        await dispatch(getSavedPost(currentUser, postId)).then(response => {
+          if (response && _.includes(savedList, response.id)) {
+            setSavedId(response.id);
+          }
+        });
+      }
     };
 
     toggleSave();

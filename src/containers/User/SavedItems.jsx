@@ -36,7 +36,6 @@ const SavedItems = props => {
     value === index && (
       <Can I="read" this={{ __type: 'User', id: userId }}>
         <h1>Saved Items</h1>
-        {console.log('data', data)}
         {data.map(post => {
           if (!post.title) {
             return (
@@ -49,7 +48,7 @@ const SavedItems = props => {
                 commentId={post.hash_id}
                 jetId={post.jet_id}
                 updatedAt={post.updated_at}
-                username={username}
+                username={post.voter_id}
                 score={post.cached_votes_score}
                 depth={post.depth}
                 setUpdateComment={setUpdateComment}
@@ -74,7 +73,7 @@ const SavedItems = props => {
               title={post.title}
               uri={post.uri}
               updatedAt={post.updated_at}
-              username={username}
+              username={post.voter_id}
               score={post.cached_votes_score}
               setUpdatePost={setUpdatePost}
               style={{ backgroundColor: 'lightblue' }}

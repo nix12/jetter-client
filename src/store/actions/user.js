@@ -190,9 +190,8 @@ export const getSavedComments = username => dispatch => {
     }
   };
 
-  return axiosForum
-    .get(url, savedData)
-    .then(response =>
-      dispatch(savedItems(_.map(response.data.saved_comments, 'id')))
-    );
+  return axiosForum.get(url, savedData).then(response => {
+    console.log('[savedComments]', response.data.saved_comments);
+    dispatch(savedItems(_.map(response.data.saved_comments, 'id')));
+  });
 };

@@ -117,6 +117,7 @@ const Comment = props => {
   const upvotedList = useSelector(state => state.user.voter.votes.upvoted);
   const downvotedList = useSelector(state => state.user.voter.votes.downvoted);
   const savedList = useSelector(state => state.user.voter.savedList);
+  const currentUser = useSelector(state => state.auth.currentUser.username);
 
   const upvoted = async (jet, text, comment) => {
     if (up) {
@@ -168,9 +169,18 @@ const Comment = props => {
   };
 
   const saveCommentHandler = () => {
-    dispatch(saveComment(username, commentId)).then(response =>
-      setSavedId(response.id)
-    );
+    console.log('[currentUser]', currentUser);
+    console.log('[username]', username);
+    if (currentUser === username) {
+      dispatch(saveComment(username, commentId)).then(response =>
+        setSavedId(response.id)
+      );
+    } else {
+      console.log('in currentUser');
+      dispatch(saveComment(currentUser, commentId)).then(response =>
+        setSavedId(response.id)
+      );
+    }
   };
 
   const unsaveCommentHandler = saveId => {
@@ -182,11 +192,21 @@ const Comment = props => {
 
   useEffect(() => {
     const toggleSave = async () => {
-      await dispatch(getSavedComment(username, commentId)).then(response => {
-        if (response && _.includes(savedList, response.id)) {
-          setSavedId(response.id);
-        }
-      });
+      if (currentUser === username) {
+        await dispatch(getSavedComment(username, commentId)).then(response => {
+          if (response && _.includes(savedList, response.id)) {
+            setSavedId(response.id);
+          }
+        });
+      } else {
+        await dispatch(getSavedComment(currentUser, commentId)).then(
+          response => {
+            if (response && _.includes(savedList, response.id)) {
+              setSavedId(response.id);
+            }
+          }
+        );
+      }
     };
 
     toggleSave();

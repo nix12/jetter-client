@@ -16,8 +16,6 @@ const Jet = props => {
   const { jetId } = router.query;
   let posts;
 
-  const username = useSelector(state => state.auth.currentUser.username);
-
   if (loading) {
     posts = <CircularProgress />;
   } else if (!_.isEmpty(data)) {
@@ -34,7 +32,7 @@ const Jet = props => {
         uri={post.uri}
         body={post.body}
         updatedAt={post.updated_at}
-        username={username}
+        username={post.voter_id}
         score={post.cached_votes_score}
         setUpdatePost={setUpdatePost}
       />

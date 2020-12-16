@@ -49,7 +49,7 @@ const PostHistory = props => {
                 commentId={post.hash_id}
                 jetId={post.jet_id}
                 updatedAt={post.updated_at}
-                username={username}
+                username={post.voter_id}
                 score={post.cached_votes_score}
                 depth={post.depth}
                 setUpdateComment={setUpdateComment}
@@ -74,7 +74,7 @@ const PostHistory = props => {
               title={post.title}
               uri={post.uri}
               updatedAt={post.updated_at}
-              username={username}
+              username={post.voter_id}
               score={post.cached_votes_score}
               setUpdatePost={setUpdatePost}
               style={{ backgroundColor: 'lightblue' }}

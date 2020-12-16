@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import _ from 'lodash';
 import axios from '../services/axios/axios-forum';
 
@@ -10,8 +9,6 @@ const all = props => {
 
   const [data, setData] = useState(allData);
   const [updatePost, setUpdatePost] = useState(false);
-
-  const username = useSelector(state => state.auth.currentUser.username);
 
   const posts = data.posts.map(post => (
     <Post
@@ -26,7 +23,7 @@ const all = props => {
       body={post.body}
       uri={post.uri}
       updatedAt={post.updated_at}
-      username={username}
+      username={post.voter_id}
       score={post.cached_votes_score}
       setUpdatePost={setUpdatePost}
     />
