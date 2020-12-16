@@ -72,7 +72,7 @@ export const logout = () => dispatch => {
       .then(response => {
         removeCookie();
         ability.update([]);
-        // dispatch(authLogout());
+        dispatch(authLogout());
 
         return response;
       })
@@ -109,10 +109,8 @@ export const auth = (username, password) => dispatch => {
   return axios
     .post(url, authData)
     .then(response => {
-      console.log('[RESPONSE]', response);
       const token = response.data.access_token;
       const data = jwtDecode(token);
-      console.log('[data]', data);
 
       setCookie(token, response.data.expires_in);
       defineRulesFor(data.user);

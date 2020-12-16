@@ -28,4 +28,4 @@ export const COMMENT_FAIL = 'COMMENT_FAIL';
 export const UPDATE_UPVOTED = 'UPDATE_UPVOTED';
 export const UPDATE_DOWNVOTED = 'UPDATE_DOWNVOTED';
 
-export const SAVED_POSTS = 'SAVED_POSTS';
+export const SAVED_ITEMS = 'SAVED_ITEMS';

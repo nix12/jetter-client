@@ -15,13 +15,22 @@ import Typography from '@material-ui/core/Typography';
 import ArrowUp from '@material-ui/icons/ExpandLess';
 import ArrowDown from '@material-ui/icons/ExpandMore';
 import Divider from '@material-ui/core/Divider';
+import Star from '@material-ui/icons/Star';
+import StarBorder from '@material-ui/icons/StarBorder';
+
+import IsLoggedIn from '../../Permissions/LoggedIn';
 
 import CommentForm from '../../Forms/Comment';
 import RedirectToLogin from '../../Permissions/RedirectToLogin';
 import Button from '../Button/Button';
 import axios from '../../../services/axios/axios-forum';
 import Can from '../../Permissions/Can';
-import { deleteComment } from '../../../store/actions';
+import {
+  deleteComment,
+  saveComment,
+  unsaveComment,
+  getSavedComment
+} from '../../../store/actions/index';
 
 const useStyles = makeStyles({
   card: {
@@ -86,6 +95,7 @@ const Comment = props => {
   const [up, setUpvote] = useState(false);
   const [down, setDownvote] = useState(false);
   const [toggleEdit, setToggleEdit] = useState(false);
+  const [savedId, setSavedId] = useState(null);
 
   const isLoggedIn = useSelector(state => state.auth.currentUser.isLoggedIn);
 
@@ -106,6 +116,7 @@ const Comment = props => {
 
   const upvotedList = useSelector(state => state.user.voter.votes.upvoted);
   const downvotedList = useSelector(state => state.user.voter.votes.downvoted);
+  const savedList = useSelector(state => state.user.voter.savedList);
 
   const upvoted = async (jet, text, comment) => {
     if (up) {
@@ -156,10 +167,30 @@ const Comment = props => {
     return _.includes(_.map(list, 'hash_id'), commentId);
   };
 
+  const saveCommentHandler = () => {
+    dispatch(saveComment(username, commentId)).then(response =>
+      setSavedId(response.id)
+    );
+  };
+
+  const unsaveCommentHandler = saveId => {
+    dispatch(unsaveComment(username, saveId)).then(() => setSavedId(null));
+  };
+
   useEffect(() => setUpvote(checkVoted(upvotedList)), [upvotedList]);
   useEffect(() => setDownvote(checkVoted(downvotedList)), [downvotedList]);
 
-  const saveComment = () => {};
+  useEffect(() => {
+    const toggleSave = async () => {
+      await dispatch(getSavedComment(username, commentId)).then(response => {
+        if (response && _.includes(savedList, response.id)) {
+          setSavedId(response.id);
+        }
+      });
+    };
+
+    toggleSave();
+  }, [savedId, savedList]);
 
   return (
     <div className={classes.indentComments}>
@@ -235,11 +266,22 @@ const Comment = props => {
                     delete
                   </Button>
                 </Can>
-                <Can do="create" on={comment}>
-                  <Button size="small" onClick={() => saveComment}>
-                    save
-                  </Button>
-                </Can>
+                <IsLoggedIn>
+                  {savedId ? (
+                    <Button
+                      size="small"
+                      clicked={() => unsaveCommentHandler(savedId)}
+                    >
+                      <Star />
+                      &nbsp; save
+                    </Button>
+                  ) : (
+                    <Button size="small" clicked={() => saveCommentHandler()}>
+                      <StarBorder />
+                      &nbsp; save
+                    </Button>
+                  )}
+                </IsLoggedIn>
               </CardActions>
             </div>
           )}

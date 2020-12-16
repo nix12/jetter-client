@@ -19,7 +19,8 @@ import {
   authCheckState,
   getUpvoted,
   getDownvoted,
-  getSavedPosts
+  getSavedPosts,
+  getSavedComments
 } from '../../store/actions/index';
 
 const useStyles = makeStyles({
@@ -84,6 +85,12 @@ const Layout = props => {
   useEffect(() => {
     if (username) {
       dispatch(getSavedPosts(username));
+    }
+  }, [username]);
+
+  useEffect(() => {
+    if (username) {
+      dispatch(getSavedComments(username));
     }
   }, [username]);
 

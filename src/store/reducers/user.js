@@ -59,11 +59,11 @@ export const updateDownvoted = (state, action) => {
   });
 };
 
-export const savedPosts = (state, action) => {
+export const savedItems = (state, action) => {
   return updateObject(state, {
     voter: {
       ...state.voter,
-      savedList: action.savedList
+      savedList: [...state.voter.savedList, ...action.savedList]
     }
   });
 };
@@ -80,8 +80,8 @@ const reducer = (state = initialState, action) => {
       return updateUpvoted(state, action);
     case actionTypes.UPDATE_DOWNVOTED:
       return updateDownvoted(state, action);
-    case actionTypes.SAVED_POSTS:
-      return savedPosts(state, action);
+    case actionTypes.SAVED_ITEMS:
+      return savedItems(state, action);
     default:
       return state;
   }

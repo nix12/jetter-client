@@ -19,11 +19,12 @@ import Divider from '@material-ui/core/Divider';
 
 import axios from '../../../services/axios/axios-forum';
 import Can from '../../Permissions/Can';
+import IsLoggedIn from '../../Permissions/LoggedIn';
 import RedirectToLogin from '../../Permissions/RedirectToLogin';
 import {
   deletePost,
-  save,
-  unsave,
+  savePost,
+  unsavePost,
   getSavedPost
 } from '../../../store/actions/index';
 
@@ -150,12 +151,14 @@ const Post = props => {
     return _.includes(_.map(list, 'hash_id'), postId);
   };
 
-  const savePost = () => {
-    dispatch(save(username, postId)).then(response => setSavedId(response.id));
+  const savePostHandler = () => {
+    dispatch(savePost(username, postId)).then(response =>
+      setSavedId(response.id)
+    );
   };
 
-  const unsavePost = saveId => {
-    dispatch(unsave(username, saveId)).then(() => setSavedId(null));
+  const unsavePostHandler = saveId => {
+    dispatch(unsavePost(username, saveId)).then(() => setSavedId(null));
   };
 
   useEffect(() => setUpvote(checkVote(upvotedList)), [upvotedList]);
@@ -259,19 +262,19 @@ const Post = props => {
               delete
             </Button>
           </Can>
-          <Can do="create" on={post}>
+          <IsLoggedIn>
             {savedId ? (
-              <Button size="small" onClick={() => unsavePost(savedId)}>
+              <Button size="small" onClick={() => unsavePostHandler(savedId)}>
                 <Star />
                 &nbsp; save
               </Button>
             ) : (
-              <Button size="small" onClick={() => savePost()}>
+              <Button size="small" onClick={() => savePostHandler()}>
                 <StarBorder />
                 &nbsp; save
               </Button>
             )}
-          </Can>
+          </IsLoggedIn>
         </CardActions>
       </div>
     </Card>

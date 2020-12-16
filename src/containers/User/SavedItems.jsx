@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Cookies from 'universal-cookie';
 
@@ -9,8 +9,9 @@ import Comment from '../../components/UI/Comment/Comment';
 import axios from '../../services/axios/axios-forum';
 import redirectTo from '../../shared/redirectTo';
 
-const PostHistory = props => {
+const SavedItems = props => {
   const { value, index } = props;
+  // const user = useSelector(state => state.auth.currentUser);
 
   const [data, setData] = useState([]);
   const [updatePost, setUpdatePost] = useState(false);
@@ -20,23 +21,22 @@ const PostHistory = props => {
   const username = useSelector(state => state.auth.currentUser.username);
 
   useEffect(() => {
-    const fetchPostHistory = async () => {
-      const postHistory = await axios.get(
-        `/api/voters/${username}/post_history`
-      );
+    const fetchSavedItems = async () => {
+      const savedItems = await axios.get(`/api/voters/${username}/saved_items`);
 
-      setData(postHistory.data.history);
+      setData(savedItems.data.saved_items);
     };
 
     if (username) {
-      fetchPostHistory();
+      fetchSavedItems();
     }
   }, [username, updateComment, updatePost]);
 
   return (
     value === index && (
       <Can I="read" this={{ __type: 'User', id: userId }}>
-        <h1>Post History</h1>
+        <h1>Saved Items</h1>
+        {console.log('data', data)}
         {data.map(post => {
           if (!post.title) {
             return (
@@ -65,7 +65,7 @@ const PostHistory = props => {
                 __type: post.type === 'Post' ? 'Link' : 'Text',
                 ...post
               }}
-              type={post.type.toLowerCase()}
+              type={post.type ? post.type.toLowerCase() : null}
               body={post.body}
               comments={post.comments_count}
               createdAt={post.created_at}
@@ -86,7 +86,7 @@ const PostHistory = props => {
   );
 };
 
-PostHistory.getInitialProps = async ({ res, isServer }) => {
+SavedItems.getInitialProps = async ({ res, isServer }) => {
   const cookies = new Cookies();
   const token = cookies.get('token');
 
@@ -97,4 +97,4 @@ PostHistory.getInitialProps = async ({ res, isServer }) => {
   return {};
 };
 
-export default PostHistory;
+export default SavedItems;

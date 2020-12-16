@@ -6,10 +6,14 @@ export {
   update,
   getUpvoted,
   getDownvoted,
-  save,
-  unsave,
+  savePost,
+  unsavePost,
   getSavedPost,
-  getSavedPosts
+  getSavedPosts,
+  saveComment,
+  unsaveComment,
+  getSavedComment,
+  getSavedComments
 } from './user';
 
 export { createJet } from './jet';

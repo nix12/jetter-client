@@ -22,6 +22,8 @@ const Show = props => {
   const { jetId, type, postId } = router.query;
   let comments;
 
+  const username = useSelector(state => state.auth.currentUser.username);
+
   const renderComment = comment => {
     return comment.map(child => (
       <Comment
@@ -33,7 +35,7 @@ const Show = props => {
         commentId={child.hash_id}
         jetId={child.jet_id}
         updatedAt={child.updated_at}
-        username={child.voter_id}
+        username={username}
         score={child.cached_votes_score}
         nestedComments={renderComment(child.children)}
         depth={child.ancestry_depth}
@@ -115,7 +117,7 @@ const Show = props => {
         title={data.post.title}
         uri={data.post.uri}
         updatedAt={data.post.updated_at}
-        username={data.post.voter_id}
+        username={username}
         score={data.post.cached_votes_score}
         setUpdatePost={setUpdatePost}
       />

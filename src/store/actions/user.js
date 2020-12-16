@@ -82,16 +82,18 @@ export const getDownvoted = username => dispatch => {
   });
 };
 
-// Saving Posts
+// Get saved items
 
-export const savedPosts = savedList => {
+export const savedItems = savedList => {
   return {
-    type: actionTypes.SAVED_POSTS,
+    type: actionTypes.SAVED_ITEMS,
     savedList
   };
 };
 
-export const save = (username, postId) => dispatch => {
+// Saving Posts
+
+export const savePost = (username, postId) => dispatch => {
   const url = `/api/voters/${username}/saved_posts`;
 
   const savedData = {
@@ -101,12 +103,12 @@ export const save = (username, postId) => dispatch => {
     }
   };
 
-  return axiosForum.post(url, savedData).then(response => {
-    return response.data.saved_post;
-  })
+  return axiosForum
+    .post(url, savedData)
+    .then(response => response.data.saved_post);
 };
 
-export const unsave = (username, saveId) => dispatch => {
+export const unsavePost = (username, saveId) => dispatch => {
   const url = `/api/voters/${username}/saved_posts/${saveId}`;
   return axiosForum.delete(url);
 };
@@ -138,6 +140,59 @@ export const getSavedPosts = username => dispatch => {
   return axiosForum
     .get(url, savedData)
     .then(response =>
-      dispatch(savedPosts(_.map(response.data.saved_posts, 'id')))
+      dispatch(savedItems(_.map(response.data.saved_posts, 'id')))
+    );
+};
+
+// Saving Comments
+
+export const saveComment = (username, commentId) => dispatch => {
+  const url = `/api/voters/${username}/saved_comments`;
+
+  const savedData = {
+    saved_comment: {
+      comment_id: commentId,
+      voter_id: username
+    }
+  };
+
+  return axiosForum
+    .post(url, savedData)
+    .then(response => response.data.saved_comment);
+};
+
+export const unsaveComment = (username, saveId) => dispatch => {
+  const url = `/api/voters/${username}/saved_comments/${saveId}`;
+  return axiosForum.delete(url);
+};
+
+export const getSavedComment = (username, commentId) => dispatch => {
+  const url = `/api/voters/${username}/saved_comments/${commentId}`;
+
+  const savedData = {
+    params: {
+      voter_id: username,
+      comment_id: commentId
+    }
+  };
+
+  return axiosForum
+    .get(url, savedData)
+    .then(response => response.data.saved_comment);
+};
+
+export const getSavedComments = username => dispatch => {
+  const url = `/api/voters/${username}/saved_comments`;
+
+  const savedData = {
+    params: {
+      voter_id: username
+    }
+  };
+
+  return axiosForum
+    .get(url, savedData)
+    .then(response =>
+      dispatch(savedItems(_.map(response.data.saved_comments, 'id')))
     );
 };

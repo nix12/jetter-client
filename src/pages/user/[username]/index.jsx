@@ -6,7 +6,7 @@ import Select from '@material-ui/core/Select/Select';
 import MenuItem from '@material-ui/core/MenuItem/MenuItem';
 import Profile from '../../../containers/User/Profile';
 import PostHistory from '../../../containers/User/PostHistory';
-import SavedPosts from '../../../containers/User/SavedPosts';
+import SavedPosts from '../../../containers/User/SavedItems';
 
 import redirectTo from '../../../shared/redirectTo';
 
