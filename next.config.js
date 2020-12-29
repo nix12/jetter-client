@@ -35,6 +35,7 @@ module.exports = withBundleAnalyzer({
     CLIENT_ID: process.env.CLIENT_ID,
     CLIENT_SECRET: process.env.CLIENT_SECRET,
     PRODUCTION_CLIENT_ID: process.env.PRODUCTION_CLIENT_ID,
-    PRODUCTION_CLIENT_SECRET: process.env.PRODUCTION_CLIENT_SECRET
+    PRODUCTION_CLIENT_SECRET: process.env.PRODUCTION_CLIENT_SECRET,
+    KONG_JWT: process.env.KONG_JWT
   }
 });

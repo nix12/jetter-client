@@ -111,7 +111,7 @@ export const auth = (username, password) => dispatch => {
     .then(response => {
       const token = response.data.access_token;
       const data = jwtDecode(token);
-
+      console.log(token);
       setCookie(token, response.data.expires_in);
       defineRulesFor(data.user);
 

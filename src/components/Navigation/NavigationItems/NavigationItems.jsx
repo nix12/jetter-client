@@ -21,7 +21,6 @@ const navigationItems = props => {
       >
         My Profile
       </NavigationItem>
-
       <NavigationItem
         click={onClose}
         link="/user/[username]/password"
@@ -29,7 +28,6 @@ const navigationItems = props => {
       >
         Change Password
       </NavigationItem>
-
       <NavigationItem click={onClose} link="/logout" linkAs="/logout">
         Logout
       </NavigationItem>

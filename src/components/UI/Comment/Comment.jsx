@@ -29,7 +29,7 @@ import {
   deleteComment,
   saveComment,
   unsaveComment,
-  getSavedComment
+  getSavedItems
 } from '../../../store/actions/index';
 
 const useStyles = makeStyles({
@@ -97,8 +97,6 @@ const Comment = props => {
   const [toggleEdit, setToggleEdit] = useState(false);
   const [savedId, setSavedId] = useState(null);
 
-  const isLoggedIn = useSelector(state => state.auth.currentUser.isLoggedIn);
-
   const classes = useStyles({ depth });
   const dispatch = useDispatch();
   const router = useRouter();
@@ -117,6 +115,7 @@ const Comment = props => {
   const upvotedList = useSelector(state => state.user.voter.votes.upvoted);
   const downvotedList = useSelector(state => state.user.voter.votes.downvoted);
   const savedList = useSelector(state => state.user.voter.savedList);
+  const isLoggedIn = useSelector(state => state.auth.currentUser.isLoggedIn);
   const currentUser = useSelector(state => state.auth.currentUser.username);
 
   const upvoted = async (jet, text, comment) => {
@@ -192,24 +191,17 @@ const Comment = props => {
 
   useEffect(() => {
     const toggleSave = async () => {
-      if (currentUser === username) {
-        await dispatch(getSavedComment(username, commentId)).then(response => {
-          if (response && _.includes(savedList, response.id)) {
-            setSavedId(response.id);
-          }
-        });
-      } else {
-        await dispatch(getSavedComment(currentUser, commentId)).then(
-          response => {
-            if (response && _.includes(savedList, response.id)) {
-              setSavedId(response.id);
-            }
-          }
-        );
-      }
+      await dispatch(getSavedItems(username, savedList)).then(listId => {
+        console.log('[Comment UI Response] toggleSave', listId);
+        if (listId && _.includes(savedList, listId)) {
+          setSavedId(listId);
+        }
+      });
     };
 
-    toggleSave();
+    if (isLoggedIn) {
+      toggleSave();
+    }
   }, [savedId, savedList]);
 
   return (

@@ -17,7 +17,10 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import Button from '@material-ui/core/Button';
+
 import NavigationItems from '../NavigationItems/NavigationItems';
+
+import IsLoggedIn from '../../Permissions/LoggedIn';
 
 const useStyles = makeStyles(theme => ({
   grow: {
@@ -156,7 +159,6 @@ const toolbar = props => {
           <MailIcon />
         </Badge>
       </IconButton>
-
       <IconButton
         edge="end"
         aria-owns={isMenuOpen ? 'material-appbar' : undefined}
@@ -174,7 +176,6 @@ const toolbar = props => {
       <Link href="/signup">
         <Button color="inherit">Sign Up</Button>
       </Link>
-
       <Link href="/login">
         <Button color="inherit">Login</Button>
       </Link>
@@ -216,11 +217,16 @@ const toolbar = props => {
               />
             </div>
             <div className={classes.grow} />
-            <div>
-              <Link href="/jets">
-                <Button>Jets</Button>
-              </Link>
-            </div>
+            <Link href="/jets">
+              <Button>Jets</Button>
+            </Link>
+            <IsLoggedIn>
+              <IconButton color="inherit">
+                <Badge badgeContent={4} color="secondary">
+                  <MailIcon />
+                </Badge>
+              </IconButton>
+            </IsLoggedIn>
             <div className={classes.sectionDesktop}>
               {/* {loggedIn ? loggedInNav : loggedOutNav} */}
               {loggedIn ? loggedInMobileNav : loggedOutNav}

@@ -14,13 +14,14 @@ import Button from '@material-ui/core/Button';
 import Toolbar from '../../components/Navigation/Toolbar/Toolbar';
 import DefaultJets from '../../components/Navigation/DefaultJets/DefaultJets';
 import Trending from '../../components/Navigation/Trending/Trending';
-import LoggedIn from '../../components/Permissions/LoggedIn';
+import IsLoggedIn from '../../components/Permissions/LoggedIn';
 import {
   authCheckState,
   getUpvoted,
   getDownvoted,
   getSavedPosts,
-  getSavedComments
+  getSavedComments,
+  getSavedItems
 } from '../../store/actions/index';
 
 const useStyles = makeStyles({
@@ -62,8 +63,9 @@ const Layout = props => {
   const [loading, setLoading] = useState(true);
 
   const username = useSelector(state => state.auth.currentUser.username);
-  const isLoggedIn = useSelector(state => state.auth.currentUser.isLoggedIn);
+  const loggedIn = useSelector(state => state.auth.currentUser.isLoggedIn);
   const error = useSelector(state => state.auth.error);
+  const savedList = useSelector(state => state.user.voter.savedList);
 
   const { jetId } = router.query;
 
@@ -71,28 +73,34 @@ const Layout = props => {
   useEffect(() => dispatch(authCheckState()), []);
 
   useEffect(() => {
-    if (username) {
+    if (loggedIn) {
       dispatch(getUpvoted(username));
     }
-  }, [username]);
+  }, [loggedIn]);
 
   useEffect(() => {
-    if (username) {
+    if (loggedIn) {
       dispatch(getDownvoted(username));
     }
-  }, [username]);
+  }, [loggedIn]);
 
   useEffect(() => {
-    if (username) {
+    if (loggedIn) {
       dispatch(getSavedPosts(username));
     }
-  }, [username]);
+  }, [loggedIn]);
 
   useEffect(() => {
-    if (username) {
+    if (loggedIn) {
       dispatch(getSavedComments(username));
     }
-  }, [username]);
+  }, [loggedIn]);
+
+  useEffect(() => {
+    if (loggedIn && savedList.length > 0) {
+      dispatch(getSavedItems(username, savedList));
+    }
+  }, [loggedIn, savedList]);
 
   let errorMessage = null;
   if (error) {
@@ -101,7 +109,7 @@ const Layout = props => {
 
   return (
     <div>
-      <Toolbar user={username} loggedIn={isLoggedIn} />
+      <Toolbar user={username} loggedIn={loggedIn} />
       <h3 style={{ textAlign: 'center' }}>UNDER CONSTRUCTION</h3>
       <div className={classes.jets}>
         <DefaultJets />
@@ -112,7 +120,7 @@ const Layout = props => {
           {children}
         </Grid>
         <Grid lg={2} item className={classes.buttons}>
-          <LoggedIn>
+          <IsLoggedIn>
             <Link href="/j/new">
               <Button color="primary" variant="contained">
                 Create Jet
@@ -125,7 +133,7 @@ const Layout = props => {
                 </Button>
               </Link>
             ) : null}
-          </LoggedIn>
+          </IsLoggedIn>
           <Grid>
             {loading ? (
               <CircularProgress />

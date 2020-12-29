@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { object } from 'prop-types';
 import * as actionTypes from './actionTypes';
 import axios from '../../services/axios/axios-user';
 import axiosForum from '../../services/axios/axios-forum';
@@ -137,11 +138,12 @@ export const getSavedPosts = username => dispatch => {
     }
   };
 
-  return axiosForum
-    .get(url, savedData)
-    .then(response =>
-      dispatch(savedItems(_.map(response.data.saved_posts, 'id')))
-    );
+  return axiosForum.get(url, savedData).then(response => {
+    const postIds = _.map(response.data.saved_posts, 'post_id');
+    const assignType = postIds.map(id => [id, 'post']);
+
+    dispatch(savedItems(assignType));
+  });
 };
 
 // Saving Comments
@@ -191,7 +193,68 @@ export const getSavedComments = username => dispatch => {
   };
 
   return axiosForum.get(url, savedData).then(response => {
-    console.log('[savedComments]', response.data.saved_comments);
-    dispatch(savedItems(_.map(response.data.saved_comments, 'id')));
+    const commentIds = _.map(response.data.saved_comments, 'comment_id');
+    const assignType = commentIds.map(id => [id, 'comment']);
+
+    dispatch(savedItems(assignType));
+  });
+};
+
+// Batch requests
+
+export const getSavedItems = (username, savedList) => dispatch => {
+  const url = `/api/batch`;
+
+  const batch = {
+    requests: []
+  };
+  // console.log('[SAVED LIST]', savedList)
+  savedList.map(saved => {
+    // console.log('[Saved]', saved);
+    if (saved[1] === 'post') {
+      batch.requests.push({
+        method: 'GET',
+        url: `/api/voters/${username}/saved_posts/${saved[0]}?${
+          process.env.KONG_JWT
+        }`,
+        body: {
+          voter_id: username,
+          post_id: saved[0]
+        }
+      });
+    } else {
+      batch.requests.push({
+        method: 'GET',
+        url: `/api/voters/${username}/saved_comments/${saved[0]}?${
+          process.env.KONG_JWT
+        }`,
+        body: {
+          voter_id: username,
+          comment_id: saved[0]
+        }
+      });
+    }
+  });
+
+  return axiosForum.post(url, batch).then(response => {
+    const parsed = _.flatMap(response.data.responses, data =>
+      JSON.parse(data.body)
+    );
+
+    const ids = _.map(
+      parsed,
+      _.partialRight(_.pick, ['saved_post.post_id', 'saved_comment.comment_id'])
+    );
+
+    const result = _.flatMap(ids, id => {
+      const postId = id.saved_post ? id.saved_post.post_id : null;
+      const commentId = id.saved_comment ? id.saved_comment.comment_id : null;
+
+      return _.values({
+        id: postId || commentId || []
+      });
+    });
+
+    return result;
   });
 };

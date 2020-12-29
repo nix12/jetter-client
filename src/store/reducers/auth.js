@@ -36,6 +36,13 @@ export const authSuccess = (state, action) => {
 
 export const authFail = (state, action) => {
   return updateObject(state, {
+    currentUser: {
+      isLoggedIn: false,
+      userId: null,
+      username: null,
+      roles: [],
+      rules: []
+    },
     error: action.error,
     loading: false
   });
@@ -48,11 +55,10 @@ export const authLogout = (state, action) => {
       userId: null,
       username: null,
       roles: [],
-      rules: null
+      rules: []
     }
   });
 };
-
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.AUTH_START:

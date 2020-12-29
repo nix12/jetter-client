@@ -25,8 +25,9 @@ import {
   deletePost,
   savePost,
   unsavePost,
-  getSavedPost
+  getSavedItems
 } from '../../../store/actions/index';
+import SavedItems from '../../../containers/User/SavedItems';
 
 const useStyles = makeStyles({
   card: {
@@ -101,6 +102,7 @@ const Post = props => {
   const upvotedList = useSelector(state => state.user.voter.votes.upvoted);
   const downvotedList = useSelector(state => state.user.voter.votes.downvoted);
   const savedList = useSelector(state => state.user.voter.savedList);
+  const savedItems = _.map(savedList, _.head);
   const currentUser = useSelector(state => state.auth.currentUser.username);
 
   const upvoted = async (jet, type, postId) => {
@@ -173,18 +175,8 @@ const Post = props => {
 
   useEffect(() => {
     const toggleSave = async () => {
-      if (currentUser === username) {
-        await dispatch(getSavedPost(username, postId)).then(response => {
-          if (response && _.includes(savedList, response.id)) {
-            setSavedId(response.id);
-          }
-        });
-      } else {
-        await dispatch(getSavedPost(currentUser, postId)).then(response => {
-          if (response && _.includes(savedList, response.id)) {
-            setSavedId(response.id);
-          }
-        });
+      if (_.includes(savedItems, postId)) {
+        setSavedId(postId);
       }
     };
 

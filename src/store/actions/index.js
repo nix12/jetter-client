@@ -13,7 +13,8 @@ export {
   saveComment,
   unsaveComment,
   getSavedComment,
-  getSavedComments
+  getSavedComments,
+  getSavedItems
 } from './user';
 
 export { createJet } from './jet';

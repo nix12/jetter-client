@@ -1,33 +1,46 @@
 import React, { useState, useEffect, useRef } from 'react';
 import _ from 'lodash';
-import axios from '../services/axios/axios-forum';
 
+import Pagination from '@material-ui/lab/Pagination/Pagination';
 import Post from '../components/UI/Post/Post';
+
+import axios from '../services/axios/axios-forum';
 
 const all = props => {
   const { allData } = props;
 
+  const itemsPerPage = 25;
+
   const [data, setData] = useState(allData);
   const [updatePost, setUpdatePost] = useState(false);
+  const [page, setPage] = useState(1);
 
-  const posts = data.posts.map(post => (
-    <Post
-      key={post.hash_id}
-      post={{ __type: post.type === 'Link' ? 'Link' : 'Text', ...post }}
-      type={post.type.toLowerCase()}
-      comments={post.comments_count}
-      createdAt={post.created_at}
-      jetId={post.jet_id}
-      postId={post.hash_id}
-      title={post.title}
-      body={post.body}
-      uri={post.uri}
-      updatedAt={post.updated_at}
-      username={post.voter_id}
-      score={post.cached_votes_score}
-      setUpdatePost={setUpdatePost}
-    />
-  ));
+  const posts = data.posts
+    .slice((page - 1) * itemsPerPage, page * itemsPerPage + 1)
+    .map(post => (
+      <Post
+        key={post.hash_id}
+        post={{ __type: post.type === 'Link' ? 'Link' : 'Text', ...post }}
+        type={post.type.toLowerCase()}
+        comments={post.comments_count}
+        createdAt={post.created_at}
+        jetId={post.jet_id}
+        postId={post.hash_id}
+        title={post.title}
+        body={post.body}
+        uri={post.uri}
+        updatedAt={post.updated_at}
+        username={post.voter_id}
+        score={post.cached_votes_score}
+        setUpdatePost={setUpdatePost}
+      />
+    ));
+
+  const [noOfPages] = useState(Math.ceil(posts.length / itemsPerPage));
+
+  const handleChange = (event, value) => {
+    setPage(value);
+  };
 
   const usePrevious = value => {
     const ref = useRef();
@@ -62,7 +75,26 @@ const all = props => {
 
   useDeepComparison(allData);
 
-  return data.posts.length > 0 ? posts : <p>No posts found.</p>;
+  return data.posts.length > 0 ? (
+    <div>
+      {posts}
+      <Pagination
+        count={noOfPages}
+        page={page}
+        onChange={handleChange}
+        defaultPage={1}
+        color="primary"
+        size="large"
+        showFirstButton
+        showLastButton
+        variant="outlined"
+        shape="rounded"
+        style={{ display: 'flex', justifyContent: 'center' }}
+      />
+    </div>
+  ) : (
+    <p>No posts found.</p>
+  );
 };
 
 all.getInitialProps = async () => {

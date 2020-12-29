@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import _ from 'lodash';
 
 import CircularProgress from '@material-ui/core/CircularProgress/CircularProgress';
+import Button from '@material-ui/core/Button/Button';
+
 import Post from '../../../components/UI/Post/Post';
 
 import axios from '../../../services/axios/axios-forum';
@@ -76,7 +79,14 @@ const Jet = props => {
 
   useDeepComparison(jetData);
 
-  return posts;
+  return (
+    <div>
+      <Link href="#">
+        <Button>Subscribe</Button>
+      </Link>
+      {posts}
+    </div>
+  );
 };
 
 Jet.getInitialProps = async ({ query }) => {
