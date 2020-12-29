@@ -174,7 +174,7 @@ const Post = props => {
   useEffect(() => setDownvote(checkVote(downvotedList)), [downvotedList]);
 
   useEffect(() => {
-    const toggleSave = async () => {
+    const toggleSave = () => {
       if (_.includes(savedItems, postId)) {
         setSavedId(postId);
       }

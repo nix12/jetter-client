@@ -115,6 +115,7 @@ const Comment = props => {
   const upvotedList = useSelector(state => state.user.voter.votes.upvoted);
   const downvotedList = useSelector(state => state.user.voter.votes.downvoted);
   const savedList = useSelector(state => state.user.voter.savedList);
+  const savedItems = _.map(savedList, _.head);
   const isLoggedIn = useSelector(state => state.auth.currentUser.isLoggedIn);
   const currentUser = useSelector(state => state.auth.currentUser.username);
 
@@ -190,18 +191,13 @@ const Comment = props => {
   useEffect(() => setDownvote(checkVoted(downvotedList)), [downvotedList]);
 
   useEffect(() => {
-    const toggleSave = async () => {
-      await dispatch(getSavedItems(username, savedList)).then(listId => {
-        console.log('[Comment UI Response] toggleSave', listId);
-        if (listId && _.includes(savedList, listId)) {
-          setSavedId(listId);
-        }
-      });
+    const toggleSave = () => {
+      if (_.includes(savedItems, commentId)) {
+        setSavedId(commentId);
+      }
     };
 
-    if (isLoggedIn) {
-      toggleSave();
-    }
+    toggleSave();
   }, [savedId, savedList]);
 
   return (
