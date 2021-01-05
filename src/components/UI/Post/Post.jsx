@@ -21,13 +21,7 @@ import axios from '../../../services/axios/axios-forum';
 import Can from '../../Permissions/Can';
 import IsLoggedIn from '../../Permissions/LoggedIn';
 import RedirectToLogin from '../../Permissions/RedirectToLogin';
-import {
-  deletePost,
-  savePost,
-  unsavePost,
-  getSavedItems
-} from '../../../store/actions/index';
-import SavedItems from '../../../containers/User/SavedItems';
+import { deletePost, savePost, unsavePost } from '../../../store/actions/index';
 
 const useStyles = makeStyles({
   card: {

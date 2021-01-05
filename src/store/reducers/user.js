@@ -10,7 +10,8 @@ const initialState = {
       downvoted: []
     },
     history: [],
-    savedList: []
+    savedList: [],
+    subscriptions: []
   }
 };
 

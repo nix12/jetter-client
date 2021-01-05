@@ -6,7 +6,7 @@ import Post from '../components/UI/Post/Post';
 
 import axios from '../services/axios/axios-forum';
 
-const all = props => {
+const All = props => {
   const { allData } = props;
 
   const itemsPerPage = 25;
@@ -97,11 +97,11 @@ const all = props => {
   );
 };
 
-all.getInitialProps = async () => {
+All.getInitialProps = async () => {
   const url = '/api/all';
   const allPosts = await axios.get(url);
 
   return { allData: allPosts.data };
 };
 
-export default all;
+export default All;

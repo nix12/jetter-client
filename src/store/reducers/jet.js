@@ -2,6 +2,10 @@ import * as actionTypes from '../actions/actionTypes';
 import { updateObject } from '../../shared/utility';
 
 const initialState = {
+  jet: null,
+  subscribers: {
+    subscribersCount: null
+  },
   error: null,
   loading: false
 };
@@ -15,6 +19,12 @@ export const jetStart = (state, action) => {
 
 export const jetSuccess = (state, action) => {
   return updateObject(state, {
+    ...state,
+    jet: action.jet,
+    subscribers: {
+      ...state.subscribers,
+      subscribersCount: action.subscribersCount
+    },
     error: null,
     loading: false
   });

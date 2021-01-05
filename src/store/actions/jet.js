@@ -1,11 +1,34 @@
 import axios from '../../services/axios/axios-forum';
 import * as actionTypes from './actionTypes';
 
+export const jetSuccess = (jet, subscribersCount) => {
+  return {
+    type: actionTypes.JET_SUCCESS,
+    jet,
+    subscribersCount
+  };
+};
+
 export const jetFail = error => {
   return {
     type: actionTypes.JET_FAIL,
     error
   };
+};
+
+export const getJet = jetId => dispatch => {
+  const url = `/api/jets/${jetId}`;
+
+  return axios
+    .get(url)
+    .then(response =>
+      dispatch(
+        jetSuccess(
+          response.data.jet,
+          response.data.jet.subscribers.subscribers_count
+        )
+      )
+    );
 };
 
 export const createJet = (name, description) => dispatch => {

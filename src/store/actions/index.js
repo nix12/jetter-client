@@ -17,8 +17,14 @@ export {
   getSavedItems
 } from './user';
 
-export { createJet } from './jet';
+export { getJet, createJet } from './jet';
 
 export { createPost, updatePost, deletePost } from './post';
 
 export { createComment, updateComment, deleteComment } from './comment';
+
+export {
+  listSubscriptions,
+  createSubscription,
+  deleteSubscription
+} from './subscription';
